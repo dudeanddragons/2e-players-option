@@ -1,7 +1,7 @@
 {
   "id": "2e-players-option",
   "title": "2e Players Option",
-  "version": "12.25.01.11.01",
+  "version": "12.25.01.11.02",
   "compatibility": {
     "minimum": "12",
     "verified": "12",
@@ -29,5 +29,7 @@
   ],
   "scripts": ["scripts/poSpellPoints.js"],
   "styles": ["styles/ars.css"],
-  "templates": ["templates/poSpellPoints.hbs"]
+  "templates": ["templates/poSpellPoints.hbs"],
+  "manifest": "https://raw.githubusercontent.com/dudeanddragons/2e-players-option/refs/heads/master/module.json",
+  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.01.11.02.zip"
 }

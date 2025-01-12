@@ -165,23 +165,55 @@ Hooks.on("renderActorSheet", async (sheet, html) => {
       });
 
               // Cast Spell Action
-              html.on('click', '.spell-cast', async function (event) {
-                if (!actor.isOwner) return;
-                event.stopImmediatePropagation();
-            
-                const spellPointsCost = $(this).data('spell-points');
-                if (currentPoints >= spellPointsCost) {
-                    currentPoints -= spellPointsCost;
-                    spellPointsPercentage = (currentPoints / totalSpellPoints) * 100;
-                    statusBarColor = getStatusBarColor(spellPointsPercentage);
-            
-                    $('#current-spell-points').text(`Current Spell Points: ${currentPoints}`);
-                    spellPointsSection.find('.status-bar-fill').css('width', `${currentPoints}%`).css('background-color', statusBarColor);
-            
-                    await actor.setFlag("world", "currentPoints", currentPoints);
-                } else {
-                    ui.notifications.warn("Not enough spell points to cast this spell!");
+              html.find(".spell-cast").off("click").on("click", async function (event) {
+                event.preventDefault();
+              
+                // Retrieve the actor from the rendered sheet context
+                const actorId = sheet.actor.id;
+                const actor = game.actors.get(actorId);
+              
+                if (!actor) {
+                  ui.notifications.error("Actor not found!");
+                  console.error("Failed to retrieve actor with ID:", actorId);
+                  return;
                 }
-            });
+              
+                const spellId = $(this).data("spell-id");
+                const spellItem = actor.items.get(spellId);
+              
+                if (!spellItem) {
+                  ui.notifications.warn("Spell not found!");
+                  console.error("Failed to find spell for ID:", spellId);
+                  return;
+                }
+              
+                // Determine spell level and cost
+                const spellLevel = spellItem.system.level || 0;
+                const spellCost = spellPointConversion[spellLevel] || 0;
+              
+                // Fetch current spell points
+                const currentSpellPoints = actor.getFlag("2e-players-option", "spellPoints") || 0;
+              
+                // Check if the actor has enough spell points to cast
+                if (currentSpellPoints >= spellCost) {
+                  // Deduct spell points
+                  const updatedPoints = currentSpellPoints - spellCost;
+                  await actor.setFlag("2e-players-option", "spellPoints", updatedPoints);
+              
+                  // Use existing utility to update spell points and bar UI
+                  await updateActorSpellPoints(actor);
+              
+                  // Log and notify
+                  console.log(`${actor.name} casts "${spellItem.name}". Spell Points remaining: ${updatedPoints}`);
+                  ChatMessage.create({
+                    speaker: { actor: actor.id, alias: actor.name },
+                    content: `${actor.name} casts <b>${spellItem.name}</b> (Level ${spellLevel}), consuming ${spellCost} spell points.`,
+                  });
+                } else {
+                  ui.notifications.warn("Not enough spell points to cast this spell!");
+                  console.warn(`${actor.name} does not have enough spell points to cast "${spellItem.name}".`);
+                }
+              });
+              
 
 });

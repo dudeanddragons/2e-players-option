@@ -23,56 +23,59 @@
   </div>
 </div>
 
-<table class="spell-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-  <thead>
-    <tr>
-      <th style="width: 5%; text-align: center;">{{localize ""}}</th>
-      <th style="width: 40%; text-align: left;">{{localize "Name"}}</th>
-      <th style="width: 10%; text-align: center;">{{localize "Components"}}</th>
-      <th style="width: 10%; text-align: center;">{{localize "Cast Time"}}</th>
-      <th style="width: 25%; text-align: center;">{{localize "Range"}}</th>
-      <th style="width: 10%; text-align: center;">{{localize ""}}</th>
-    </tr>
-  </thead>
-</table>
+<div class="spell-section" data-actor-id="{{@root.actor.id}}">
+  <table class="spell-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+    <thead>
+      <tr>
+        <th style="width: 5%; text-align: center;">{{localize ""}}</th>
+        <th style="width: 40%; text-align: left;">{{localize "Name"}}</th>
+        <th style="width: 10%; text-align: center;">{{localize "Components"}}</th>
+        <th style="width: 10%; text-align: center;">{{localize "Cast Time"}}</th>
+        <th style="width: 25%; text-align: center;">{{localize "Range"}}</th>
+        <th style="width: 10%; text-align: center;">{{localize ""}}</th>
+      </tr>
+    </thead>
+  </table>
 
-{{#each spellLevels}}
-<div class="spell-level-header" data-level="{{this.level}}" style="cursor: pointer; font-size: 10pt; margin-bottom: 5px;">
-  <h4>
-    <i class="fas fa-angle-{{#if this.isCollapsed}}right{{else}}down{{/if}}"></i> Level {{this.level}} Spells
-  </h4>
+  {{#each spellLevels}}
+  <div class="spell-level-header" data-level="{{this.level}}" style="cursor: pointer; font-size: 10pt; margin-bottom: 5px;">
+    <h4>
+      <i class="fas fa-angle-{{#if this.isCollapsed}}right{{else}}down{{/if}}"></i> Level {{this.level}} Spells
+    </h4>
+  </div>
+  <table class="spell-level-group" style="width: 100%; display: {{#if this.isCollapsed}}none{{else}}table{{/if}};" data-actor-id="{{@root.actor.id}}">
+    {{#if this.spells.length}}
+      {{#each this.spells}}
+      <tr style="font-size: 10pt; text-align: center;">
+        <td style="width: 5%; text-align: center;">
+          <div class="item-image" style="display: inline-block; width: 30px; height: 30px;">
+            <img src="{{this.img}}" alt="{{this.name}}" style="width: 100%; height: 100%;" />
+          </div>
+        </td>
+        <td style="width: 40%; text-align: left;">
+          <span class="spell-name-clickable" data-spell-id="{{this.id}}">{{this.name}}</span>
+        </td>
+        <td style="width: 10%; text-align: center;">{{#if this.system.components.verbal}}V{{/if}}{{#if this.system.components.somatic}}S{{/if}}{{#if this.system.components.material}}M{{/if}}</td>
+        <td style="width: 10%; text-align: center;">{{this.system.castingTime}}</td>
+        <td style="width: 25%; text-align: center;">{{this.system.range}}</td>
+        <td style="width: 10%; text-align: right;">
+          <a class="spell-cast" data-spell-id="{{this.id}}" data-spell-points="{{../spellPointConversion.[this.system.level]}}">
+            <img src="icons/svg/daze.svg" title="Cast" style="width: 25px; height: 25px; cursor: pointer; margin-right: 2px;" />
+          </a>
+          <a class="spell-init" data-spell-id="{{this.id}}">
+            <img src="icons/svg/d20-highlight.svg" title="Roll Initiative" style="width: 25px; height: 25px; cursor: pointer;" />
+          </a>
+        </td>
+      </tr>
+      {{/each}}
+    {{else}}
+      <tr>
+        <td colspan="6" style="text-align: center;">No spells available at this level.</td>
+      </tr>
+    {{/if}}
+  </table>
+  {{/each}}
 </div>
-<table class="spell-level-group" style="width: 100%; display: {{#if this.isCollapsed}}none{{else}}table{{/if}};">
-  {{#if this.spells.length}}
-    {{#each this.spells}}
-    <tr style="font-size: 10pt; text-align: center;">
-      <td style="width: 5%; text-align: center;">
-        <div class="item-image" style="display: inline-block; width: 30px; height: 30px;">
-          <img src="{{this.img}}" alt="{{this.name}}" style="width: 100%; height: 100%;" />
-        </div>
-      </td>
-      <td style="width: 40%; text-align: left;">
-        <span class="spell-name-clickable" data-spell-id="{{this.id}}">{{this.name}}</span>
-      </td>
-      <td style="width: 10%; text-align: center;">{{#if this.system.components.verbal}}V{{/if}}{{#if this.system.components.somatic}}S{{/if}}{{#if this.system.components.material}}M{{/if}}</td>
-      <td style="width: 10%; text-align: center;">{{this.system.castingTime}}</td>
-      <td style="width: 25%; text-align: center;">{{this.system.range}}</td>
-      <td style="width: 10%; text-align: right;">
-        <a class="spell-cast" data-spell-id="{{this.id}}" data-spell-points="{{../spellPointConversion.[this.system.level]}}">
-          <img src="icons/svg/daze.svg" title="Cast" style="width: 25px; height: 25px; cursor: pointer; margin-right: 2px;" />
-        </a>
-        <a class="spell-init" data-spell-id="{{this.id}}">
-          <img src="icons/svg/d20-highlight.svg" title="Roll Initiative" style="width: 25px; height: 25px; cursor: pointer;" />
-        </a>
-      </td>
-    </tr>
-    {{/each}}
-  {{else}}
-    <tr>
-      <td colspan="6" style="text-align: center;">No spells available at this level.</td>
-    </tr>
-  {{/if}}
-</table>
-{{/each}}
+
 
 
