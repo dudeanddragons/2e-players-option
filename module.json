@@ -1,0 +1,30 @@
+{
+  "id": "2e-players-option",
+  "title": "2e Players Option",
+  "version": "12.25.01.11.01",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12",
+    "maximum": "12"
+  },
+  "authors": [
+    {
+      "name": "DudeandDragons",
+      "flags": {}
+    }
+  ],
+  "packs": [
+    {
+      "name": "players-option-macros",
+      "label": "Players Option Macros",
+      "path": "packs/players-option-macros",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "system": "ars",
+      "flags": {}
+    }
+  ]
+}
