@@ -26,5 +26,8 @@
       "system": "ars",
       "flags": {}
     }
-  ]
+  ],
+  "scripts": ["scripts/poSpellPoints.js"],
+  "styles": ["styles/ars.css"],
+  "templates": ["templates/poSpellPoints.hbs"]
 }

@@ -1,0 +1,19 @@
+.po-spell-points {
+    border: 1px solid var(--ars_purple_dark_header);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: var(--ars_purple_light);
+  }
+  
+  .po-spell-points .flexrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .po-spell-points input {
+    width: 60px;
+    text-align: center;
+  }
+  

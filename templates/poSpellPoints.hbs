@@ -1,0 +1,28 @@
+<div class="general-header ars_clps{{#if (getViewState @root.actor.id "spell-points-section")}} ars_clps_on{{/if}}"
+    data-vs-control="spell-points-section">
+  {{localize "ARS.spellPoints"}}
+</div>
+<div class="ars_clps_container ars_light_bg container-padding">
+  <div class="flexrow">
+    <div class="flexcol flex1">
+      <label for="spell-points" class="resource-label">{{localize "ARS.currentSpellPoints"}}</label>
+      <input
+        type="number"
+        id="spell-points"
+        name="flags.po.spellPoints"
+        value="{{flags.po.spellPoints}}"
+        data-dtype="Number"
+        class="resource-numberfield input-light" />
+    </div>
+    <div class="flexcol flex1">
+      <label for="max-spell-points" class="resource-label">{{localize "ARS.maxSpellPoints"}}</label>
+      <input
+        type="number"
+        id="max-spell-points"
+        name="flags.po.maxSpellPoints"
+        value="{{flags.po.maxSpellPoints}}"
+        data-dtype="Number"
+        class="resource-numberfield input-light" />
+    </div>
+  </div>
+</div>
