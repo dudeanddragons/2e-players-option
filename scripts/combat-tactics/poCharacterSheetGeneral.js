@@ -56,15 +56,3 @@ function calculateMaxFA(app) {
     const bonusFA = parseInt(app.object.getFlag('core', 'bonusFA') || 0);
     return baseFA + bonusFA;
 }
-
-// ---- Add Settings ---- //
-Hooks.once('init', () => {
-    game.settings.register("2e-players-option", "enableFatigue", {
-        name: "Enable Fatigue System",
-        scope: "world",
-        config: true,
-        type: Boolean,
-        default: true,
-        onChange: () => window.location.reload() // Reload sheets when setting changes
-    });
-});
