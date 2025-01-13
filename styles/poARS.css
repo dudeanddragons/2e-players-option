@@ -101,3 +101,12 @@
     align-items: center;
 }
 
+.item-knockdown {
+  min-width: 80px; /* Matches the width of other fields */
+  margin-left: 0.5em; /* Adjust spacing between fields */
+}
+
+.item-knockdown .resource-label {
+  text-align: left;
+  font-weight: bold;
+}
