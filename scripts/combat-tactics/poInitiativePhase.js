@@ -1,11 +1,16 @@
 // Phases Definition
 const PHASES = [
     { range: [0, 2], id: 1, name: "VF" }, // Very Fast
-    { range: [3, 5], id: 2, name: "FA" }, // Fast
-    { range: [6, 8], id: 3, name: "AV" }, // Average
-    { range: [9, 11], id: 4, name: "SL" }, // Slow
-    { range: [12, Infinity], id: 5, name: "VS" } // Very Slow
+    { range: [3, 4], id: 2, name: "FA" }, // Fast
+    { range: [5, 7], id: 3, name: "AV" }, // Average
+    { range: [8, 10], id: 4, name: "SL" }, // Slow
+    { range: [11, Infinity], id: 5, name: "VS" } // Very Slow
 ];
+
+// Helper: Format as Two-Digit Integer
+function formatTwoDigit(num) {
+    return num < 10 ? `0${num}` : `${num}`;
+}
 
 // Determine Phase Based on Modifiers
 function getPhase(initModifier) {
@@ -18,22 +23,23 @@ function getPhase(initModifier) {
 }
 
 // Hook: Capture Initiative Rolls via Chat Message
-Hooks.on('createChatMessage', async (chatMessage) => {
+Hooks.on("createChatMessage", async (chatMessage) => {
+    const enablePhases = game.settings.get("2e-players-option", "enableInitiPhases");
+    if (!enablePhases) return;
+
     const roll = chatMessage.rolls?.[0];
-    if (!roll) return; // Ignore non-roll messages
+    if (!roll) return;
 
     const formula = roll.formula;
     const total = roll.total;
     console.log(`Chat message roll detected: ${formula}, Total: ${total}`);
 
-    // Extract modifiers and calculate the phase
-    const match = formula.match(/\+\s*(\d+)/); // Extract the first modifier (e.g., "+6")
+    const match = formula.match(/\+\s*(\d+)/);
     const initModifier = match ? parseInt(match[1], 10) : 0;
     const phase = getPhase(initModifier);
 
     console.log(`Calculated Phase: ${phase.name} (${initModifier})`);
 
-    // Find the combatant associated with this roll
     const speaker = chatMessage.speaker;
     const combat = game.combats.active;
     if (!combat) {
@@ -41,46 +47,64 @@ Hooks.on('createChatMessage', async (chatMessage) => {
         return;
     }
 
-    const combatant = combat.combatants.find(c => c.token?.id === speaker.token);
+    const combatant = combat.combatants.find((c) => c.token?.id === speaker.token);
     if (!combatant) {
         console.warn(`No combatant found for speaker: ${speaker.actor}`);
         return;
     }
 
-    // Store the phase on the combatant
-    await combatant.setFlag('world', 'initiativePhase', phase.name);
-    console.log(`Set phase ${phase.name} for combatant ${combatant.name}`);
+    // Update the roll with the phase ID prefix
+    const formattedRoll = `${phase.id}.${formatTwoDigit(total)}`;
+    const updatedRoll = parseFloat(formattedRoll);
+    console.log(`Updated Roll with Phase ID: ${formattedRoll}`);
 
-    // Trigger tracker re-render to update UI
+    // Store all relevant data points as flags
+    await combatant.setFlag("world", "initiativeData", {
+        actorID: combatant.actor?.id,
+        combatantID: combatant.id,
+        actorName: combatant.actor?.name,
+        roll: formattedRoll,
+        modifier: initModifier,
+        phase: phase.name,
+        phaseID: phase.id
+    });
+
+    // Update the initiative with the new formatted roll
+    await combatant.update({ initiative: updatedRoll });
+    console.log(`Set initiative to ${formattedRoll} for combatant ${combatant.name}`);
+
+    // Trigger sorting and tracker re-render
     ui.combat.render(true);
 });
 
 // Hook: Render Combat Tracker and Display/Remove Phases
-Hooks.on('renderCombatTracker', (app, html, data) => {
-    const combatants = html.find('li.combatant.actor.directory-item');
+Hooks.on("renderCombatTracker", (app, html, data) => {
+    const enablePhases = game.settings.get("2e-players-option", "enableInitiPhases");
+    if (!enablePhases) return;
+
+    const combatants = html.find("li.combatant.actor.directory-item");
 
     combatants.each((index, element) => {
-        const combatantId = $(element).data('combatant-id');
-        const combatant = app.viewed?.combatants?.find(c => c.id === combatantId);
+        const combatantId = $(element).data("combatant-id");
+        const combatant = app.viewed?.combatants?.find((c) => c.id === combatantId);
         if (!combatant) return;
 
-        // Get the stored phase
-        const phase = combatant.getFlag('world', 'initiativePhase');
-        const initiativeElement = $(element).find('.token-initiative');
+        const initiativeData = combatant.getFlag("world", "initiativeData");
+        if (!initiativeData) return;
+
+        const { phase, roll } = initiativeData;
+        const initiativeElement = $(element).find(".token-initiative");
         if (!initiativeElement.length) return;
 
         const initiativeValue = initiativeElement.text().trim();
 
         if (initiativeValue) {
-            // Add phase dynamically
-            const phaseIndicator = initiativeElement.find('.phase');
-            if (!phaseIndicator.length) {
-                initiativeElement.html(`${initiativeValue} <span class="phase" style="margin-left: 5px;">${phase}</span>`);
-                console.log(`Added phase ${phase} to combatant ${combatant.name}`);
-            }
+            // Show roll and phase only if initiative is visible
+            initiativeElement.html(`${roll} ${phase}`);
+            console.log(`Added phase ${phase} to combatant ${combatant.name}`);
         } else {
             // Remove phase if initiative is no longer displayed
-            initiativeElement.find('.phase').remove();
+            initiativeElement.find(".phase").remove();
             console.log(`Removed phase for combatant ${combatant.name}`);
         }
     });
