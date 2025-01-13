@@ -29,6 +29,7 @@
   ],
   "scripts": [
     "scripts/poSettings.js",
+    "scripts/combat-tactics/poCharacterSheetGeneral.js",
     "scripts/combat-tactics/poWeaponAttributes.js",
     "scripts/combat-tactics/poCombatRounds.js",
     "scripts/spells-magic/poSpellPoints.js"
