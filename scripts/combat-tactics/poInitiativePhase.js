@@ -12,6 +12,12 @@ function formatTwoDigit(num) {
     return num < 10 ? `0${num}` : `${num}`;
 }
 
+// Cap Initiative Values
+function capInitiativeValue(phaseID, rollValue) {
+    const cappedRoll = Math.max(1.01, Math.min(5.99, parseFloat(`${phaseID}.${formatTwoDigit(rollValue)}`)));
+    return cappedRoll.toFixed(2); // Ensure two decimal places
+}
+
 // Determine Phase Based on Modifiers
 function getPhase(initModifier) {
     for (const phase of PHASES) {
@@ -20,6 +26,17 @@ function getPhase(initModifier) {
         }
     }
     return { id: 3, name: "AV" }; // Default to Average
+}
+
+// Adjust Phase Based on Natural Roll
+function adjustPhase(phaseID, naturalRoll) {
+    if (naturalRoll === 1 && phaseID > 1) {
+        return phaseID - 1; // Move to faster phase
+    }
+    if (naturalRoll === 10 && phaseID < 5) {
+        return phaseID + 1; // Move to slower phase
+    }
+    return phaseID; // No change
 }
 
 // Hook: Capture Initiative Rolls via Chat Message
@@ -36,9 +53,18 @@ Hooks.on("createChatMessage", async (chatMessage) => {
 
     const match = formula.match(/\+\s*(\d+)/);
     const initModifier = match ? parseInt(match[1], 10) : 0;
-    const phase = getPhase(initModifier);
 
-    console.log(`Calculated Phase: ${phase.name} (${initModifier})`);
+    // Calculate natural roll
+    const naturalRoll = total - initModifier;
+    console.log(`Natural Roll: ${naturalRoll}`);
+
+    // Get initial phase
+    let phase = getPhase(initModifier);
+
+    // Adjust phase based on natural roll
+    const adjustedPhaseID = adjustPhase(phase.id, naturalRoll);
+    phase = PHASES.find(p => p.id === adjustedPhaseID);
+    console.log(`Adjusted Phase: ${phase.name} (${adjustedPhaseID})`);
 
     const speaker = chatMessage.speaker;
     const combat = game.combats.active;
@@ -53,25 +79,25 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         return;
     }
 
-    // Update the roll with the phase ID prefix
-    const formattedRoll = `${phase.id}.${formatTwoDigit(total)}`;
-    const updatedRoll = parseFloat(formattedRoll);
-    console.log(`Updated Roll with Phase ID: ${formattedRoll}`);
+    // Cap the initiative value
+    const cappedRoll = capInitiativeValue(adjustedPhaseID, total);
+    console.log(`Capped Initiative Value: ${cappedRoll}`);
 
     // Store all relevant data points as flags
     await combatant.setFlag("world", "initiativeData", {
         actorID: combatant.actor?.id,
         combatantID: combatant.id,
         actorName: combatant.actor?.name,
-        roll: formattedRoll,
+        roll: cappedRoll,
+        naturalRoll,
         modifier: initModifier,
         phase: phase.name,
-        phaseID: phase.id
+        phaseID: adjustedPhaseID
     });
 
-    // Update the initiative with the new formatted roll
-    await combatant.update({ initiative: updatedRoll });
-    console.log(`Set initiative to ${formattedRoll} for combatant ${combatant.name}`);
+    // Update the initiative with the capped value
+    await combatant.update({ initiative: parseFloat(cappedRoll) });
+    console.log(`Set initiative to ${cappedRoll} for combatant ${combatant.name}`);
 
     // Trigger sorting and tracker re-render
     ui.combat.render(true);
