@@ -1,0 +1,17 @@
+<form>
+  <h2>Combat & Tactics Configuration</h2>
+  
+  <div class="form-group">
+    <label for="enable12SecondRounds">Enable 12-Second Rounds</label>
+    <input type="checkbox" name="enable12SecondRounds" {{#if enable12SecondRounds}}checked{{/if}} />
+  </div>
+
+  <div class="form-group">
+    <label for="advance600EndCombat">Advance 600 Seconds After Combat</label>
+    <input type="checkbox" name="advance600EndCombat" {{#if advance600EndCombat}}checked{{/if}} />
+  </div>
+
+  <footer>
+    <button type="submit" class="submit-button">Submit</button>
+  </footer>
+</form>

@@ -27,9 +27,18 @@
       "flags": {}
     }
   ],
-  "scripts": ["scripts/poSpellPoints.js"],
-  "styles": ["styles/ars.css"],
-  "templates": ["templates/poSpellPoints.hbs"],
+  "scripts": [
+    "scripts/poSettings.js",
+    "scripts/poWeaponSize.js",
+    "scripts/combat-tactics/poCombatRounds.js",
+    "scripts/spells-magic/poSpellPoints.js"
+  ],
+  "styles": ["styles/poARS.css"],
+  "templates": [
+    "templates/poSpellPoints.hbs",
+    "templates/poCombatTacticsConfig.hbs"
+],
   "manifest": "https://raw.githubusercontent.com/dudeanddragons/2e-players-option/refs/heads/master/module.json",
-  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.01.11.02.zip"
+  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.01.11.02.zip",
+  "website": "https://github.com/dudeanddragons/2e-players-option"
 }
