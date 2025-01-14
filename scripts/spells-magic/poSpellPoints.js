@@ -122,28 +122,85 @@ Hooks.on("renderActorSheet", async (sheet, html) => {
   }
 
           // Roll Initiative Action
-          html.on('click', '.spell-init', async function (event) {
-            if (!actor.isOwner) return;
-            event.stopImmediatePropagation();
+// Roll Initiative Action
+html.on('click', '.spell-init', async function (event) {
+  if (!actor.isOwner) return;
+  event.stopImmediatePropagation();
 
-            const spellID = $(this).data("spell-id");
-            const spellItem = actor.items.get(spellID);
-            let initModifier = parseInt(spellItem.system.castingTime) || 0;
-            if (isNaN(initModifier) || initModifier > 9) initModifier = 10;
+  const spellID = $(this).data("spell-id");
+  const spellItem = actor.items.get(spellID);
+  let initModifier = parseInt(spellItem.system.castingTime) || 0;
+  if (isNaN(initModifier) || initModifier > 9) initModifier = 10;
 
-            const roll = new Roll(`1d10 + ${initModifier}`);
-            await roll.evaluate();
+  const roll = new Roll(`1d10 + ${initModifier}`);
+  await roll.evaluate(); // Removed the async option
 
-            roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor }),
-                flavor: `Initiative Roll for ${spellItem.name}: 1d10 + ${initModifier}`,
-            });
+  // Generate custom chat message content
+  const messageContent = `
+  <div class="dice-roll">
+      <div class="a25-image">
+          <img src="icons/magic/defensive/illusion-evasion-echo-purple.webp" data-tooltip="1d10" width="50" height="50">
+      </div>
+      <div class="flexrow dice-flavor initiative-flavor general-subheader">            
+          <div>Initiative for ${spellItem.name}</div>
+      </div>
+      <div class="dice-result">
+          <div data-tooltip="1d10 + @casttime" class="dice-formula">${roll.formula}</div>
+          <div class="dice-tooltip">
+              <section class="tooltip-part">
+                  <div class="dice">
+                      <header class="part-header flexrow">
+                          <span class="part-formula">1d10</span>
+                          <span class="part-total">${roll.terms[0].results[0].result}</span>
+                      </header>
+                      <ol class="dice-rolls">
+                          <li class="roll die d10">${roll.terms[0].results[0].result}</li>
+                      </ol>
+                  </div>
+              </section>
+          </div>
+          <h4 class="dice-total">${roll.total}</h4>
+      </div>
+  </div>`;
 
-            const combatant = actor?.combatant;
-            if (combatant) {
-                await combatant.update({ initiative: roll.total });
-            }
-        });
+// Create the chat message and flag it for the initiative tracker
+const chatMessage = await ChatMessage.create({
+  speaker: ChatMessage.getSpeaker({ actor }),
+  content: messageContent,
+  rolls: [roll.toJSON()], // Serialize the roll and include it
+  flags: {
+      "world": {
+          isInitiativeRoll: true, // Custom flag to identify initiative rolls
+          initiativeData: {
+              actorID: actor.id,
+              spellName: spellItem.name,
+              rollTotal: roll.total,
+              naturalRoll: roll.terms[0].results[0].result,
+              modifier: initModifier
+          }
+      }
+  }
+});
+
+
+  // Update initiative in the combat tracker
+  const combatant = actor?.combatant;
+  if (combatant) {
+      await combatant.update({
+          initiative: roll.total
+      });
+
+      // Add initiative data as a flag to be used by the tracker
+      await combatant.setFlag("world", "initiativeData", {
+          actorID: actor.id,
+          spellName: spellItem.name,
+          rollTotal: roll.total,
+          naturalRoll: roll.terms[0].results[0].result,
+          modifier: initModifier
+      });
+  }
+});
+
 
         // Spell Name Click Action
         html.on('click', '.spell-name-clickable', async function (event) {

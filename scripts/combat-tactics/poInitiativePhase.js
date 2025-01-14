@@ -39,17 +39,40 @@ function adjustPhase(phaseID, naturalRoll) {
     return phaseID; // No change
 }
 
+
+
+
+
+
 // Hook: Capture Initiative Rolls via Chat Message
 Hooks.on("createChatMessage", async (chatMessage) => {
     const enablePhases = game.settings.get("2e-players-option", "enableInitiPhases");
     if (!enablePhases) return;
 
+    // Check if the message is flagged as a custom initiative roll
+    const isCustomInitiativeRoll = chatMessage.flags.world?.isInitiativeRoll;
+
+    // Attempt to detect standard initiative rolls
+    const messageContent = chatMessage.content?.toLowerCase();
     const roll = chatMessage.rolls?.[0];
-    if (!roll) return;
+
+    // Stricter criteria for standard initiative rolls
+    const isStandardInitiativeRoll = !!roll && messageContent?.includes("initiative");
+
+    // If neither style matches, skip processing
+    if (!isCustomInitiativeRoll && !isStandardInitiativeRoll) {
+        console.log("Chat message is not recognized as an initiative roll. Ignoring.");
+        return;
+    }
+
+    if (!roll) {
+        console.log("No roll data found in chat message.");
+        return;
+    }
 
     const formula = roll.formula;
     const total = roll.total;
-    console.log(`Chat message roll detected: ${formula}, Total: ${total}`);
+    console.log(`Initiative roll detected: ${formula}, Total: ${total}`);
 
     const match = formula.match(/\+\s*(\d+)/);
     const initModifier = match ? parseInt(match[1], 10) : 0;
@@ -102,6 +125,16 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     // Trigger sorting and tracker re-render
     ui.combat.render(true);
 });
+
+
+
+
+
+
+
+
+
+
 
 // Hook: Render Combat Tracker and Display/Remove Phases
 Hooks.on("renderCombatTracker", (app, html, data) => {
