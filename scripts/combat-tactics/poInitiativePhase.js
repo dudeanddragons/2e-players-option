@@ -122,9 +122,35 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     await combatant.update({ initiative: parseFloat(cappedRoll) });
     console.log(`Set initiative to ${cappedRoll} for combatant ${combatant.name}`);
 
-    // Trigger sorting and tracker re-render
+    // Sort the combatants and update the combat tracker
+    await combat.update({}); // Recalculate combatant order
+    console.log("Combat tracker sorted after initiative update.");
+
+    // Check if the new initiative should affect the active turn
+    const sortedCombatants = combat.combatants
+        .filter(c => c.initiative !== null) // Only consider those with initiatives
+        .sort((a, b) => a.initiative - b.initiative); // Sort by ascending initiative (lowest first)
+
+    // Identify the current active combatant
+    const currentCombatant = combat.combatant;
+    const currentInitiative = currentCombatant?.initiative ?? Infinity; // Default to "worst" initiative if none
+
+    // Identify the combatant with the lowest initiative
+    const newTopCombatant = sortedCombatants[0];
+
+    // If the combatant with the updated initiative is now the lowest initiative
+    if (newTopCombatant.id === combatant.id && cappedRoll < currentInitiative) {
+        const newTurnIndex = combat.turns.findIndex(c => c.id === newTopCombatant.id);
+        if (newTurnIndex !== -1) {
+            await combat.update({ turn: newTurnIndex });
+            console.log(`Turn updated to combatant ${newTopCombatant.name} with initiative ${newTopCombatant.initiative}`);
+        }
+    }
+
+    // Trigger tracker re-render
     ui.combat.render(true);
 });
+
 
 
 
