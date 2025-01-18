@@ -41,9 +41,6 @@
     // Fetch weapon size, default to actor size if missing
     let atkWeaponSize = atkWeapon?.system?.attributes?.size || atkActorSize;
 
-    // Fetch weapon damage type, default to "slashing" if missing
-    const atkWeaponDamageType = atkWeapon?.system?.damage?.type || "slashing";
-
     // Determine default knockdown dice based on actor size
     const defaultKnockdownDiceTable = {
         tiny: "1d4",
@@ -58,16 +55,16 @@
 
     // Adjust knockdown dice based on weapon size compared to medium
     const sizeHierarchy = ["tiny", "small", "medium", "large", "huge", "gargantuan"];
-    const sizeIndex = sizeHierarchy.indexOf(atkWeaponSize.toLowerCase());
-    const mediumIndex = sizeHierarchy.indexOf("medium");
-    const sizeDifference = sizeIndex - mediumIndex;
+    const atkActorSizeIndex = sizeHierarchy.indexOf(atkActorSize.toLowerCase());
+    const atkWeaponSizeIndex = sizeHierarchy.indexOf(atkWeaponSize.toLowerCase());
+    const sizeDifference = atkActorSizeIndex - atkWeaponSizeIndex;
 
     // Adjust knockdown dice by size difference, capping at 1d4 and 1d12
     const diceSteps = ["1d4", "1d6", "1d8", "1d10", "1d12"];
     let currentDiceIndex = diceSteps.indexOf(atkKnockdownDice);
     if (currentDiceIndex === -1) currentDiceIndex = diceSteps.indexOf("1d8"); // Default to medium if not found
     currentDiceIndex = Math.max(0, Math.min(diceSteps.length - 1, currentDiceIndex + sizeDifference));
-    atkKnockdownDice = diceSteps[currentDiceIndex];
+    const atkKnockdownAdj = diceSteps[currentDiceIndex]; // Final adjusted knockdown dice size
 
     // Extract weapon properties and filter for "Crit:" values
     const atkCriticalProperties = Object.values(atkWeapon?.system?.attributes?.properties || {})
@@ -152,8 +149,8 @@
         atkActorSize: ${atkActorSize},
         atkWeapon: ${atkWeaponName} (UUID: ${atkWeaponUuid}),
         atkWeaponSize: ${atkWeaponSize},
-        atkWeaponDamageType: ${atkWeaponDamageType},
         atkKnockdownDice: ${atkKnockdownDice},
+        atkKnockdownAdj: ${atkKnockdownAdj},
         atkCriticalProperties: ${atkCriticalProperties || "None"},
         atkCriticalRange: ${atkCriticalRange},
         atkTarget: ${atkTargetName} (UUID: ${atkTargetTokenUuid}),
@@ -327,3 +324,39 @@
 
     return combatantData;
 })();
+
+//-----------------------------------------------------//
+// Function to roll secondary attack for critical hits //
+//-----------------------------------------------------//
+
+async function performSecondaryAttack(actor, formula, targetAC, hitAC, damageType) {
+    if (!game.user.isGM) return;
+
+    const secondaryRoll = new Roll(formula);
+    await secondaryRoll.evaluate(); 
+    await secondaryRoll.toMessage({
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        flavor: "Critical Threat",
+    });
+
+    const secondaryRollResult = secondaryRoll.total;
+    const acHit = actor.acHit(secondaryRollResult);
+
+    if (acHit <= targetAC) {
+        console.log("Secondary roll hit: Confirmed critical hit!");
+        ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            content: `<strong>Confirmed Critical Hit!</strong>`,
+        });
+
+        if (game.user.isGM) {
+            await openCriticalHitDialog(damageType); 
+        }
+    } else {
+        console.log("Secondary roll did not hit: Not a critical hit.");
+        ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            content: `<strong>Critical Hit Not Confirmed!</strong>`,
+        });
+    }
+}
