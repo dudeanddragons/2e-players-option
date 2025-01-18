@@ -21,6 +21,28 @@
     <input type="checkbox" name="enableInitiPhases" {{#if enableInitiPhases}}checked{{/if}} />
   </div>
 
+  <div class="form-group">
+    <label for="criticalHitOption">Critical Hit Option</label>
+    <select name="criticalHitOption">
+      <option value="none" {{#if (eq criticalHitOption "none")}}selected{{/if}}>None</option>
+      <option value="natural20" {{#if (eq criticalHitOption "natural20")}}selected{{/if}}>Natural 20</option>
+      <option value="natural20Plus5" {{#if (eq criticalHitOption "natural20Plus5")}}selected{{/if}}>Natural 20+5</option>
+      <option value="natural20Reroll" {{#if (eq criticalHitOption "natural20Reroll")}}selected{{/if}}>Natural 20 Reroll</option>
+      <option value="natural18Plus5" {{#if (eq criticalHitOption "natural18Plus5")}}selected{{/if}}>Natural 18+5</option>
+      <option value="natural18Reroll" {{#if (eq criticalHitOption "natural18Reroll")}}selected{{/if}}>Natural 18 Reroll</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="criticalMissOption">Critical Miss Option</label>
+    <select name="criticalMissOption">
+      <option value="none" {{#if (eq criticalMissOption "none")}}selected{{/if}}>None</option>
+      <option value="natural1" {{#if (eq criticalMissOption "natural1")}}selected{{/if}}>Natural 1</option>
+      <option value="natural1Minus5" {{#if (eq criticalMissOption "natural1Minus5")}}selected{{/if}}>Natural 1-5</option>
+      <option value="natural1Reroll" {{#if (eq criticalMissOption "natural1Reroll")}}selected{{/if}}>Natural 1 Reroll</option>
+    </select>
+  </div>
+
   <footer>
     <button type="submit" class="submit-button">Submit</button>
   </footer>
