@@ -1,11 +1,11 @@
 {
-    "name": "poCritMortalHumP",
+    "name": "poCritMajorHumP",
      "type": "table",
      "entries": [
       {
         "location": "legRight",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -26,8 +26,8 @@
       },
       {
         "location": "legLeft",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -48,8 +48,8 @@
       },
       {
         "location": "abdomen",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -70,8 +70,8 @@
       },
       {
         "location": "torso",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -92,8 +92,8 @@
       },
       {
         "location": "armRight",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -114,8 +114,8 @@
       },
       {
         "location": "armLeft",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -136,8 +136,8 @@
       },
       {
         "location": "head",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Major",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },

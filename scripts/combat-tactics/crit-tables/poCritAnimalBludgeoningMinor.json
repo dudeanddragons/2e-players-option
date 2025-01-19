@@ -1,11 +1,11 @@
 {
-    "name": "poCritMortalAnimalB",
+    "name": "poCritMinorAnimalB",
     "type": "table",
     "entries": [
       {
         "location": "forelegWingRight",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -16,8 +16,8 @@
       },
       {
         "location": "forelegWingLeft",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -28,8 +28,8 @@
       },
       {
         "location": "legHindRight",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -40,8 +40,8 @@
       },
       {
         "location": "legHindLeft",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -52,8 +52,8 @@
       },
       {
         "location": "tail",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -64,8 +64,8 @@
       },
       {
         "location": "abdomen",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -76,8 +76,8 @@
       },
       {
         "location": "torso",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
@@ -88,8 +88,8 @@
       },      
       {
         "location": "head",
-        "severity": "Mortal",
-        "dmgMultiplier": 3,
+        "severity": "Minor",
+    "dmgMultiplier": 2,
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
