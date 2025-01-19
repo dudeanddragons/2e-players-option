@@ -9,7 +9,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Victim knocked down" },
           { "effect": "Knee struck, victim reduced to 2/3 move, –2 penalty to attacks with that appendage" },
           { "effect": "Foot/wrist broken, 2/3 move, –4 penalty to attacks with that appendage" },
@@ -26,7 +25,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Victim knocked down" },
@@ -47,7 +45,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Victim knocked down" },
           { "effect": "Knee struck, victim reduced to 2/3 move, –2 penalty to attacks with that appendage" },
           { "effect": "Foot/wrist broken, 2/3 move, –4 penalty to attacks with that appendage" },
@@ -64,7 +61,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Victim knocked down" },
@@ -87,7 +83,6 @@
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Tip of tail struck; if prehensile, any items carried are dropped, –2 penalty to tail attacks due to pain" },
           { "effect": "Tail injured, lose any tail attacks" },
           { "effect": "Tail injured, lose any tail attacks" },
@@ -102,7 +97,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Victim stunned 1d4 rounds" },
@@ -123,7 +117,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Knockdown, stunned 1d4 rounds" },
           { "effect": "Torso struck, victim stunned 1 round and reduced to 2/3 move" },
           { "effect": "Torso struck, stunned 1d6 rounds, 2/3 move" },
@@ -140,7 +133,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Victim stunned 1d4 rounds" },

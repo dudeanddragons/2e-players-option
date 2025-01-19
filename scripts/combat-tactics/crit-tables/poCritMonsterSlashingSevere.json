@@ -9,7 +9,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Leg grazed, minor bleeding" },
           { "effect": "Knee struck, 2/3 move, minor bleeding" },
           { "effect": "Leg struck, minor bleeding, 2/3 move" },
@@ -26,7 +25,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Leg grazed, minor bleeding" },
@@ -47,7 +45,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Leg grazed, minor bleeding" },
           { "effect": "Knee struck, 2/3 move, minor bleeding" },
           { "effect": "Leg struck, minor bleeding, 2/3 move" },
@@ -64,7 +61,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Leg grazed, minor bleeding" },
@@ -87,7 +83,6 @@
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Tip of tail struck; if prehensile, any items carried are dropped, minor bleeding, –2 penalty to tail attacks" },
           { "effect": "Tail injured, minor bleeding, monster suffers –2 penalty to all attacks due to pain; no tail attacks" },
           { "effect": "Tail injured, minor bleeding, monster suffers –2 penalty to all attacks due to pain; no tail attacks" },
@@ -102,7 +97,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Abdomen grazed, minor bleeding" },
@@ -123,7 +117,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Torso grazed, minor bleeding" },
           { "effect": "Torso struck, victim stunned 1 round, minor bleeding" },
           { "effect": "Torso struck, stunned 1d3 rounds, minor bleeding" },
@@ -140,7 +133,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Head grazed, minor bleeding" },

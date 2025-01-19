@@ -9,7 +9,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Victim knocked down" },
           { "effect": "Knee struck, knockdown, 1/2 move" },
           { "effect": "Foot broken, 1/2 move" },
@@ -26,7 +25,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Victim knocked down" },
@@ -47,7 +45,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Victim stunned 1d6 rounds" },
           { "effect": "Abdomen struck, victim stunned 1 round and reduced to 1/2 move" },
           { "effect": "Armor damaged, victim stunned 1d6 rounds, triple damage if no armor" },
@@ -64,7 +61,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Knockdown, stunned 1d4 rounds" },
@@ -85,7 +81,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Hand struck, weapon/shield dropped" },
           { "effect": "Arm struck, shield damage/weapon dropped" },
           { "effect": "Hand broken, –2 penalty to attacks/shield dropped" },
@@ -104,7 +99,6 @@
         "effects": [
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
-          { "effect": "No unusual effect" },
           { "effect": "Hand struck, weapon/shield dropped" },
           { "effect": "Arm struck, shield damage/weapon dropped" },
           { "effect": "Hand broken, –2 penalty to attacks/shield dropped" },
@@ -121,7 +115,6 @@
         "severity": "Mortal",
         "dmgMultiplier": 3,
         "effects": [
-          { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "No unusual effect" },
           { "effect": "Victim stunned 1d6 rounds" },

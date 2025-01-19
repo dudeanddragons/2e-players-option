@@ -9,7 +9,6 @@
             "effects": [
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
-              { "effect": "No unusual effect" },
               { "effect": "Leg struck, minor bleeding" },
               { "effect": "Leg struck, minor bleeding; 1/2 move" },
               { "effect": "Leg injured, major bleeding, 1/2 move" },
@@ -26,7 +25,6 @@
             "severity": "Mortal",
             "dmgMultiplier": 3,
             "effects": [
-              { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
               { "effect": "Leg struck, minor bleeding" },
@@ -47,7 +45,6 @@
             "effects": [
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
-              { "effect": "No unusual effect" },
               { "effect": "Abdomen grazed, minor bleeding" },
               { "effect": "Abdomen struck, victim stunned 1 round and reduced to 1/2 move with minor bleeding" },
               { "effect": "Armor damaged; victim stunned 1d6 rounds, major bleeding, 1/2 move if no armor" },
@@ -64,7 +61,6 @@
             "severity": "Mortal",
             "dmgMultiplier": 3,
             "effects": [
-              { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
               { "effect": "Torso grazed, minor bleeding" },
@@ -85,7 +81,6 @@
             "effects": [
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
-              { "effect": "No unusual effect" },
               { "effect": "Hand struck, weapon dropped, minor bleeding; no effect on shield arm" },
               { "effect": "Arm struck, shield damage/weapon dropped, minor bleeding" },
               { "effect": "Hand injured, –2 penalty to attacks/shield dropped" },
@@ -104,7 +99,6 @@
             "effects": [
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
-              { "effect": "No unusual effect" },
               { "effect": "Hand struck, weapon dropped, minor bleeding; no effect on shield arm" },
               { "effect": "Arm struck, shield damage/weapon dropped, minor bleeding" },
               { "effect": "Hand injured, –2 penalty to attacks/shield dropped" },
@@ -121,7 +115,6 @@
             "severity": "Mortal",
             "dmgMultiplier": 3,
             "effects": [
-              { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
               { "effect": "No unusual effect" },
               { "effect": "Head grazed, stunned 1d3 rounds, minor bleeding" },

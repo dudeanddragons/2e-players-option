@@ -12,14 +12,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Leg struck, minor bleeding" },
               { "effect": "Leg struck, minor bleeding; 1/2 move" },
-              { "effect": "Leg injured, major bleeding, 1/2 move" },
-              { "effect": "Armor damaged; leg injured if target has no leg armor, 1/2 move, major bleeding" },
-              { "effect": "Knee shattered, major bleeding, no move, –4 penalty to any attacks" },
-              { "effect": "Armor damaged, leg struck, minor bleeding, 1/2 move; if target has no leg armor, leg severed at knee, severe bleeding, no move or attack" },
-              { "effect": "Hip shattered, no move or attack, severe bleeding" },
-              { "effect": "Leg severed, severe bleeding, no move or attack" },
-              { "effect": "Leg severed at thigh, no move or attack, victim reduced to 0 hit points with severe bleeding" }
-            ]
+              { "effect": "Leg injured, major bleeding, 1/2 move" }            ]
           },
           {
             "location": "legLeft",
@@ -31,14 +24,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Leg struck, minor bleeding" },
               { "effect": "Leg struck, minor bleeding; 1/2 move" },
-              { "effect": "Leg injured, major bleeding, 1/2 move" },
-              { "effect": "Armor damaged; leg injured if target has no leg armor, 1/2 move, major bleeding" },
-              { "effect": "Knee shattered, major bleeding, no move, –4 penalty to any attacks" },
-              { "effect": "Armor damaged, leg struck, minor bleeding, 1/2 move; if target has no leg armor, leg severed at knee, severe bleeding, no move or attack" },
-              { "effect": "Hip shattered, no move or attack, severe bleeding" },
-              { "effect": "Leg severed, severe bleeding, no move or attack" },
-              { "effect": "Leg severed at thigh, no move or attack, victim reduced to 0 hit points with severe bleeding" }
-            ]
+              { "effect": "Leg injured, major bleeding, 1/2 move" }            ]
           },
           {
             "location": "abdomen",
@@ -50,14 +36,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Abdomen grazed, minor bleeding" },
               { "effect": "Abdomen struck, victim stunned 1 round and reduced to 1/2 move with minor bleeding" },
-              { "effect": "Armor damaged; victim stunned 1d6 rounds, major bleeding, 1/2 move if no armor" },
-              { "effect": "Abdomen injured, major bleeding, 1/2 move, –2 penalty to attacks" },
-              { "effect": "Abdomen injured, severe bleeding, 1/2 move, –4 penalty to attacks" },
-              { "effect": "Armor damage, abdomen injured, minor bleeding, 1/2 move and –2 penalty to attacks; if no armor, victim at 0 hit points, major bleeding" },
-              { "effect": "Abdomen injured, no move or attack, severe bleeding" },
-              { "effect": "Abdomen injured, victim at 0 hp, severe bleeding" },
-              { "effect": "Abdomen destroyed, victim killed" }
-            ]
+              { "effect": "Armor damaged; victim stunned 1d6 rounds, major bleeding, 1/2 move if no armor" }            ]
           },
           {
             "location": "torso",
@@ -69,14 +48,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Torso grazed, minor bleeding" },
               { "effect": "Torso struck, victim stunned 1 round, reduced to 1/2 move with minor bleeding" },
-              { "effect": "Shield damage, torso struck, 1/2 move & minor bleeding" },
-              { "effect": "Armor damage, torso struck, 1/2 move, –2 penalty to attacks; if no armor, torso injured, no move or attack, severe bleeding" },
-              { "effect": "Torso injured, major bleeding, 1/2 move, –4 penalty to attacks" },
-              { "effect": "Shield damage; torso struck, –2 penalty to attacks; if no shield, torso injured, severe bleeding, no move or attack" },
-              { "effect": "Torso injured, severe bleeding, no move or attack" },
-              { "effect": "Torso destroyed, victim reduced to 0 hit points with severe bleeding" },
-              { "effect": "Torso destroyed, victim killed" }
-            ]
+              { "effect": "Shield damage, torso struck, 1/2 move & minor bleeding" }            ]
           },
           {
             "location": "armRight",
@@ -88,14 +60,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Hand struck, weapon dropped, minor bleeding; no effect on shield arm" },
               { "effect": "Arm struck, shield damage/weapon dropped, minor bleeding" },
-              { "effect": "Hand injured, –2 penalty to attacks/shield dropped" },
-              { "effect": "Armor damage, arm struck, minor bleeding; if no armor, arm injured, major bleeding" },
-              { "effect": "Hand severed, stunned 1 round, major bleeding, shield or weapon dropped" },
-              { "effect": "Armor damage, arm broken; if no armor, arm severed, stunned 1d6 rounds, major bleeding" },
-              { "effect": "Shoulder injured, no attacks, major bleeding" },
-              { "effect": "Arm severed, severe bleeding, 1/2 move" },
-              { "effect": "Arm severed, no move or attacks, severe bleeding" }
-            ]
+              { "effect": "Hand injured, –2 penalty to attacks/shield dropped" }            ]
           },
           {
             "location": "armLeft",
@@ -107,14 +72,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Hand struck, weapon dropped, minor bleeding; no effect on shield arm" },
               { "effect": "Arm struck, shield damage/weapon dropped, minor bleeding" },
-              { "effect": "Hand injured, –2 penalty to attacks/shield dropped" },
-              { "effect": "Armor damage, arm struck, minor bleeding; if no armor, arm injured, major bleeding" },
-              { "effect": "Hand severed, stunned 1 round, major bleeding, shield or weapon dropped" },
-              { "effect": "Armor damage, arm broken; if no armor, arm severed, stunned 1d6 rounds, major bleeding" },
-              { "effect": "Shoulder injured, no attacks, major bleeding" },
-              { "effect": "Arm severed, severe bleeding, 1/2 move" },
-              { "effect": "Arm severed, no move or attacks, severe bleeding" }
-            ]
+              { "effect": "Hand injured, –2 penalty to attacks/shield dropped" }            ]
           },
           {
             "location": "head",
@@ -126,14 +84,7 @@
               { "effect": "No unusual effect" },
               { "effect": "Head grazed, stunned 1d3 rounds, minor bleeding" },
               { "effect": "Head struck, helm removed, victim stunned 1 round; –2 penalty to attack rolls, minor bleeding if victim had no helm" },
-              { "effect": "Head struck, minor bleeding, victim blinded for 2d4 rounds by blood in eyes" },
-              { "effect": "Helm damaged, face injured, stunned 1d6 rounds, minor bleeding, 1/2 move, –4 penalty to attacks" },
-              { "effect": "Skull broken, helm damaged, victim reduced to 0 hit points, major bleeding" },
-              { "effect": "Throat injured, severe bleeding" },
-              { "effect": "Skull destroyed, victim reduced to 0 hp, severe bleeding, Intelligence, Wisdom, and Charisma all drop by 1/2 permanently" },
-              { "effect": "Throat destroyed, victim killed" },
-              { "effect": "Head severed, immediate death" }
-            ]
+              { "effect": "Head struck, minor bleeding, victim blinded for 2d4 rounds by blood in eyes" }            ]
           }
           
      ]
