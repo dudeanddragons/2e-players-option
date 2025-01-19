@@ -1,0 +1,548 @@
+[
+    {
+      "name": "poTblCritLocHumB",
+      "type": "table",
+      "roll": {
+        "dice": "1d10"
+      },
+      "entries": [
+        {
+          "range": [1, 2],
+          "location": "legRight"
+        },
+        {
+          "range": [3, 4],
+          "location": "legLeft"
+        },
+        {
+          "range": [5],
+          "location": "abdomen"
+        },
+        {
+          "range": [6, 7],
+          "location": "torso"
+        },
+        {
+          "range": [8],
+          "location": "armRight"
+        },
+        {
+          "range": [9],
+          "location": "armLeft"
+        },
+        {
+          "range": [10],
+          "location": "head"
+        }
+      ]
+    },
+    {
+        "name": "poTblCritLocAnimalB",
+        "type": "table",
+        "roll": {
+          "dice": "1d10"
+        },
+        "entries": [
+          {
+            "range": [1],
+            "location": "forelegWingRight"
+          },
+          {
+            "range": [2],
+            "location": "forelegWingLeft"
+          },
+          {
+            "range": [3],
+            "location": "legHindRight"
+          },
+          {
+            "range": [4],
+            "location": "legHindLeft"
+          },
+          {
+            "range": [5],
+            "location": "tail"
+          },
+          {
+            "range": [6, 7],
+            "location": "abdomen"
+          },
+          {
+            "range": [8, 9],
+            "location": "torso"
+          },
+          {
+            "range": [10],
+            "location": "head"
+          }
+        ]
+      },
+      {
+        "name": "poTblCritLocSnakeFishB",
+        "type": "table",
+        "roll": {
+          "dice": "1d10"
+        },
+        "entries": [
+          {
+            "range": [1, 2, 3, 4, 5],
+            "location": "tail"
+          },
+          {
+            "range": [6, 7],
+            "location": "abdomen"
+          },
+          {
+            "range": [8, 9],
+            "location": "torso"
+          },
+          {
+            "range": [10],
+            "location": "head"
+          }
+        ]
+      },      
+    {
+        "name": "poTblCritLocCreatureB",
+        "type": "table",
+        "roll": {
+          "dice": "1d10"
+        },
+        "entries": [
+          {
+            "range": [1],
+            "location": "forelegClawWingForelegRight"
+          },
+          {
+            "range": [2],
+            "location": "forelegClawWingForelegLeft"
+          },
+          {
+            "range": [3],
+            "location": "legHindRight"
+          },
+          {
+            "range": [4],
+            "location": "legHindLeft"
+          },
+          {
+            "range": [5],
+            "location": "tail"
+          },
+          {
+            "range": [6, 7],
+            "location": "abdomen"
+          },
+          {
+            "range": [8, 9],
+            "location": "torso"
+          },
+          {
+            "range": [10],
+            "location": "head"
+          }
+        ]
+      },
+      {
+        "name": "poTblCritLocSnakeFishB",
+        "type": "table",
+        "roll": {
+          "dice": "1d10"
+        },
+        "entries": [
+          {
+            "range": [1, 2, 3, 4, 5],
+            "location": "tail"
+          },
+          {
+            "range": [6, 7],
+            "location": "abdomen"
+          },
+          {
+            "range": [8, 9],
+            "location": "torso"
+          },
+          {
+            "range": [10],
+            "location": "head"
+          }
+        ]
+      },
+      {
+  "name": "poTblCritLocHumS",
+  "type": "table",
+  "roll": {
+    "dice": "1d10"
+  },
+  "entries": [
+    {
+      "range": [1, 2],
+      "location": "legRight"
+    },
+    {
+      "range": [3, 4],
+      "location": "legLeft"
+    },
+    {
+      "range": [5],
+      "location": "abdomen"
+    },
+    {
+      "range": [6, 7],
+      "location": "torso"
+    },
+    {
+      "range": [8],
+      "location": "armRight"
+    },
+    {
+      "range": [9],
+      "location": "armLeft"
+    },
+    {
+      "range": [10],
+      "location": "head"
+    }
+  ]
+},
+{
+    "name": "poTblCritLocHumS",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1, 2],
+        "location": "legRight"
+      },
+      {
+        "range": [3, 4],
+        "location": "legLeft"
+      },
+      {
+        "range": [5],
+        "location": "abdomen"
+      },
+      {
+        "range": [6, 7],
+        "location": "torso"
+      },
+      {
+        "range": [8],
+        "location": "armRight"
+      },
+      {
+        "range": [9],
+        "location": "armLeft"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocAnimalS",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1],
+        "location": "forelegWingRight"
+      },
+      {
+        "range": [2],
+        "location": "forelegWingLeft"
+      },
+      {
+        "range": [3],
+        "location": "legHindRight"
+      },
+      {
+        "range": [4],
+        "location": "legHindLeft"
+      },
+      {
+        "range": [5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocSnakeFishS",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1, 2, 3, 4, 5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocMonsterS",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1],
+        "location": "forelegClawWingForelegRight"
+      },
+      {
+        "range": [2],
+        "location": "forelegClawWingForelegLeft"
+      },
+      {
+        "range": [3],
+        "location": "legHindRight"
+      },
+      {
+        "range": [4],
+        "location": "legHindLeft"
+      },
+      {
+        "range": [5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocSnakeFishMonsterS",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1, 2, 3, 4, 5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocHumP",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1, 2],
+        "location": "legRight"
+      },
+      {
+        "range": [3, 4],
+        "location": "legLeft"
+      },
+      {
+        "range": [5],
+        "location": "abdomen"
+      },
+      {
+        "range": [6, 7],
+        "location": "torso"
+      },
+      {
+        "range": [8],
+        "location": "armRight"
+      },
+      {
+        "range": [9],
+        "location": "armLeft"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocAnimalP",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1],
+        "location": "forelegWingRight"
+      },
+      {
+        "range": [2],
+        "location": "forelegWingLeft"
+      },
+      {
+        "range": [3],
+        "location": "legHindRight"
+      },
+      {
+        "range": [4],
+        "location": "legHindLeft"
+      },
+      {
+        "range": [5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocSnakeFishP",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1, 2, 3, 4, 5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocMonsterP",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1],
+        "location": "forelegClawWingForelegRight"
+      },
+      {
+        "range": [2],
+        "location": "forelegClawWingForelegLeft"
+      },
+      {
+        "range": [3],
+        "location": "legHindRight"
+      },
+      {
+        "range": [4],
+        "location": "legHindLeft"
+      },
+      {
+        "range": [5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  },
+  {
+    "name": "poTblCritLocSnakeFishMonsterP",
+    "type": "table",
+    "roll": {
+      "dice": "1d10"
+    },
+    "entries": [
+      {
+        "range": [1, 2, 3, 4, 5],
+        "location": "tail"
+      },
+      {
+        "range": [6, 7],
+        "location": "abdomen"
+      },
+      {
+        "range": [8, 9],
+        "location": "torso"
+      },
+      {
+        "range": [10],
+        "location": "head"
+      }
+    ]
+  }  
+  ]
+  
+  
