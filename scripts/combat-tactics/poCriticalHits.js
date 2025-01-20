@@ -32,6 +32,13 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     const atkWeapon = atkWeaponUuid ? await fromUuid(atkWeaponUuid) : null;
     const atkWeaponName = atkWeapon?.name || "Unknown Weapon";
 
+// Fetch THAC0 from the actor's attributes
+const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
+
+
+    // Fetch weapon damage type
+    const atkDamageType = atkWeapon?.system?.damage?.type || "Unknown";
+
     // Extract critical properties from the weapon
     const atkCriticalProperties = Object.values(atkWeapon?.system?.attributes?.properties || {})
         .filter((value) => typeof value === "string" && value.toLowerCase().startsWith("crit:"))
@@ -123,24 +130,22 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     let atkFumble = false;
 
     // === Critical Hit Logic ===
-    if (criticalHitOption === "natural20Reroll" && atkNaturalRoll === 20 && atkAttackHit) {
+    if (atkCriticalThreat && (criticalHitOption === "natural20Reroll" || criticalHitOption === "natural18Reroll")) {
         console.log("Performing secondary roll to confirm critical hit...");
-        atkCriticalHit = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkCriticalRange, "critical");
-    } else if (criticalHitOption === "natural18Reroll" && atkNaturalRoll >= 18 && atkAttackHit) {
-        console.log("Performing secondary roll to confirm critical hit...");
-        atkCriticalHit = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkCriticalRange, "critical");
+        atkCriticalHit = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkThac0, "critical");
     }
-
-    // === Fumble Logic ===
-    if (criticalMissOption === "natural1Reroll" && atkNaturalRoll === 1) {
+    
+    if (atkFumbleThreat && criticalMissOption === "natural1Reroll") {
         console.log("Performing secondary roll to confirm fumble...");
-        atkFumble = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, 5, "fumble");
+        atkFumble = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkThac0, "fumble");
     }
+    
 
     // Log the results
     console.log(`Attack Metadata:
         Actor: ${atkActorName} (UUID: ${atkActorUuid}),
         Weapon: ${atkWeaponName} (UUID: ${atkWeaponUuid}),
+        Weapon Damage Type: ${atkDamageType},
         Critical Properties: ${atkCriticalProperties || "None"},
         Natural Roll: ${atkNaturalRoll},
         Total Roll: ${atkTotalRoll},
@@ -151,6 +156,7 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         Hit AC: ${atkHitAc ?? "Unknown"},
         Hit By: ${atkHitBy},
         Attack Hit: ${atkAttackHit},
+        Actor THAC0: ${atkThac0},
         Critical Range: ${atkCriticalRange},
         Critical Threat: ${atkCriticalThreat},
         Critical Hit: ${atkCriticalHit},
@@ -164,29 +170,51 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     console.log("Critical hit, fumble, and knockdown processing complete.");
 });
 
+
 /**
- * Function to roll secondary attack for critical hits or fumbles.
+ * Perform a secondary roll to confirm critical or fumble.
+ * Uses AD&D 2E logic: THAC0 - Total Roll = Hit AC.
  */
-async function performSecondaryAttack(actor, formula, targetAC, comparisonValue, rollType) {
-    if (!game.user.isGM) return false; // Ensure only the GM can execute
+async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollType) {
+    if (!game.user.isGM) return false; // Ensure only the GM can execute this
 
+    // Roll for the secondary attack
     const secondaryRoll = new Roll(formula);
-    await secondaryRoll.evaluate(); // Evaluate roll asynchronously
+    await secondaryRoll.evaluate({ async: true }); // Evaluate the roll asynchronously
 
+    // Send the roll to chat for transparency
     await secondaryRoll.toMessage({
         speaker: ChatMessage.getSpeaker({ actor: actor }),
         flavor: rollType === "critical" ? "Critical Threat Roll" : "Fumble Confirmation Roll",
     });
 
-    const secondaryRollResult = secondaryRoll.total;
+    const secondaryRollResult = secondaryRoll.total; // The result of the secondary roll
 
-    // Check the result for critical or fumble confirmation
-    if ((rollType === "critical" && secondaryRollResult >= comparisonValue) || 
-        (rollType === "fumble" && secondaryRollResult <= comparisonValue)) {
-        console.log(`Secondary roll confirmed the ${rollType}!`);
+    // Calculate the AC hit by the secondary roll
+    const secondaryHitAC = atkThac0 - secondaryRollResult;
+
+    // Logging the secondary roll details
+    console.log(`Secondary Attack Roll Details:
+        Roll Type: ${rollType},
+        Target AC: ${targetAC},
+        Secondary Roll Result: ${secondaryRollResult},
+        Actor THAC0: ${atkThac0}, // Correctly using the actor's THAC0 from metadata
+        Hit AC (Secondary Roll): ${secondaryHitAC}
+    `);
+
+    // Determine if the roll confirms a critical or fumble
+    if (rollType === "critical" && secondaryHitAC <= targetAC) {
+        console.log("Secondary roll confirmed the critical hit!");
         ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: actor }),
-            content: `<strong>Confirmed ${rollType === "critical" ? "Critical Hit" : "Fumble"}!</strong>`,
+            content: `<strong>Confirmed Critical Hit!</strong>`,
+        });
+        return true;
+    } else if (rollType === "fumble" && secondaryHitAC > targetAC) {
+        console.log("Secondary roll confirmed the fumble!");
+        ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            content: `<strong>Confirmed Fumble!</strong>`,
         });
         return true;
     } else {
@@ -198,3 +226,10 @@ async function performSecondaryAttack(actor, formula, targetAC, comparisonValue,
         return false;
     }
 }
+
+
+
+
+
+
+
