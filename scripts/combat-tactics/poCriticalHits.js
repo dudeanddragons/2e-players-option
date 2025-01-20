@@ -1,6 +1,6 @@
 /**
  * Critical Hit, Fumble, and Knockdown Processing Script
- * Automatically evaluates critical hits, fumbles, knockdowns, and logs all hit-related metadata for validation.
+ * Automatically evaluates critical hits, fumbles, knockdowns, and exports metadata for external processing.
  */
 Hooks.on("createChatMessage", async (chatMessage) => {
     // Ensure the message contains a roll
@@ -66,6 +66,7 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     const atkTargetTokenUuid = chatMessage.flags.world?.context?.targetTokenUuid || null;
     const atkTargetToken = atkTargetTokenUuid ? await fromUuid(atkTargetTokenUuid) : null;
     const atkTargetName = atkTargetToken?.name || "Unknown Target";
+    const atkTargetActorUuid = atkTargetToken?.actor?.uuid || null;
 
     // Fetch target size
     const atkTargetSize = atkTargetToken?.actor?.system?.attributes?.size || "Unknown Size";
@@ -118,7 +119,6 @@ Hooks.on("createChatMessage", async (chatMessage) => {
 
     // Fetch attacker size for knockdown logic
     const atkActorSize = atkActor?.system?.attributes?.size || "medium";
-    
 
     // Knockdown size adjustment logic
     const sizeAdjustmentTable = {
@@ -158,36 +158,24 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     }
 
     // Log the results
-    console.log(`Attack Metadata:
-        Actor: ${atkActorName} (UUID: ${atkActorUuid}),
-        Weapon: ${atkWeaponName} (UUID: ${atkWeaponUuid}),
-        Weapon Size: ${atkWeaponSize},
-        Weapon Damage Type: ${atkDamageType},
-        Critical Properties: ${atkCriticalProperties || "None"},
-        Natural Roll: ${atkNaturalRoll},
-        Total Roll: ${atkTotalRoll},
-        Roll Formula: ${atkRollFormula},
-        Target: ${atkTargetName} (UUID: ${atkTargetTokenUuid}),
-        Target Size: ${atkTargetSize},
-        Critical Severity: ${atkCriticalSeverity},
-        Target AC: ${atkTargetAc ?? "Unknown"},
-        Hit AC: ${atkHitAc ?? "Unknown"},
-        Hit By: ${atkHitBy},
-        Attack Hit: ${atkAttackHit},
-        Actor Size: ${atkActorSize},
-        Actor THAC0: ${atkThac0},
-        Critical Range: ${atkCriticalRange},
-        Critical Threat: ${atkCriticalThreat},
-        Critical Hit: ${atkCriticalHit},
-        Fumble Threat: ${atkFumbleThreat},
-        Fumble: ${atkFumble},
-        Knockdown Dice: ${atkKnockdownDice},
-        Knockdown Adjustment: ${atkKnockdownAdj},
-        Knockdown Roll Target: ${atkKnockdownRollTarget}
-    `);
+    const attackMetadata = {
+        actor: { name: atkActorName, uuid: atkActorUuid, size: atkActorSize, thac0: atkThac0 },
+        weapon: { name: atkWeaponName, uuid: atkWeaponUuid, size: atkWeaponSize, damageType: atkDamageType },
+        target: { name: atkTargetName, uuid: atkTargetActorUuid, size: atkTargetSize, ac: atkTargetAc, hitAc: atkHitAc, hitBy: atkHitBy, attackHit: atkAttackHit },
+        roll: { natural: atkNaturalRoll, total: atkTotalRoll, formula: atkRollFormula },
+        severity: atkCriticalSeverity,
+        critical: { threat: atkCriticalThreat, confirmed: atkCriticalHit },
+        fumble: { threat: atkFumbleThreat, confirmed: atkFumble },
+        knockdown: { dice: atkKnockdownDice, adjustment: atkKnockdownAdj, targetRoll: atkKnockdownRollTarget },
+    };
 
-    console.log("Critical hit, fumble, and knockdown processing complete.");
+    console.log("Attack Metadata:", attackMetadata);
+
+    if (atkCriticalHit) {
+        Hooks.call("processCriticalHit", attackMetadata);
+    }
 });
+
 
 
 
