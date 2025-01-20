@@ -1,6 +1,6 @@
 [
     {
-      "name": "poTblCritLocHumB",
+      "name": "poTblCritLocHumuanoidBludgeoning",
       "type": "table",
       "roll": {
         "dice": "1d10"
@@ -37,7 +37,7 @@
       ]
     },
     {
-        "name": "poTblCritLocAnimalB",
+        "name": "poTblCritLocAnimalBludgeoning",
         "type": "table",
         "roll": {
           "dice": "1d10"
@@ -78,7 +78,7 @@
         ]
       },
       {
-        "name": "poTblCritLocSnakeFishB",
+        "name": "poTblCritLocSnakeFishBludgeoning",
         "type": "table",
         "roll": {
           "dice": "1d10"
@@ -103,7 +103,7 @@
         ]
       },      
     {
-        "name": "poTblCritLocCreatureB",
+        "name": "poTblCritLocMonsterBludgeoning",
         "type": "table",
         "roll": {
           "dice": "1d10"
@@ -144,7 +144,7 @@
         ]
       },
       {
-        "name": "poTblCritLocSnakeFishB",
+        "name": "poTblCritLocAnimalSnakeBludgeoning",
         "type": "table",
         "roll": {
           "dice": "1d10"
@@ -168,45 +168,8 @@
           }
         ]
       },
-      {
-  "name": "poTblCritLocHumS",
-  "type": "table",
-  "roll": {
-    "dice": "1d10"
-  },
-  "entries": [
-    {
-      "range": [1, 2],
-      "location": "legRight"
-    },
-    {
-      "range": [3, 4],
-      "location": "legLeft"
-    },
-    {
-      "range": [5],
-      "location": "abdomen"
-    },
-    {
-      "range": [6, 7],
-      "location": "torso"
-    },
-    {
-      "range": [8],
-      "location": "armRight"
-    },
-    {
-      "range": [9],
-      "location": "armLeft"
-    },
-    {
-      "range": [10],
-      "location": "head"
-    }
-  ]
-},
 {
-    "name": "poTblCritLocHumS",
+    "name": "poTblCritLocHumanoidSlashing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -243,7 +206,7 @@
     ]
   },
   {
-    "name": "poTblCritLocAnimalS",
+    "name": "poTblCritLocAnimalSlashing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -284,7 +247,7 @@
     ]
   },
   {
-    "name": "poTblCritLocSnakeFishS",
+    "name": "poTblCritLocAnimalSnakeSlashing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -309,7 +272,7 @@
     ]
   },
   {
-    "name": "poTblCritLocMonsterS",
+    "name": "poTblCritLocMonsterSlashing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -350,7 +313,7 @@
     ]
   },
   {
-    "name": "poTblCritLocSnakeFishMonsterS",
+    "name": "poTblCritLocMonsterSnakeSlashing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -375,7 +338,7 @@
     ]
   },
   {
-    "name": "poTblCritLocHumP",
+    "name": "poTblCritLocHumanoidPiercing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -412,7 +375,7 @@
     ]
   },
   {
-    "name": "poTblCritLocAnimalP",
+    "name": "poTblCritLocAnimalPiercing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -453,7 +416,7 @@
     ]
   },
   {
-    "name": "poTblCritLocSnakeFishP",
+    "name": "poTblCritLocAnimalSnakePiercing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -478,7 +441,7 @@
     ]
   },
   {
-    "name": "poTblCritLocMonsterP",
+    "name": "poTblCritLocMonsterPiercing",
     "type": "table",
     "roll": {
       "dice": "1d10"
@@ -519,7 +482,7 @@
     ]
   },
   {
-    "name": "poTblCritLocSnakeFishMonsterP",
+    "name": "poTblCritLocMonsterSnakePiercing",
     "type": "table",
     "roll": {
       "dice": "1d10"
