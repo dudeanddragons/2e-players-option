@@ -111,11 +111,11 @@
         "entries": [
           {
             "range": [1],
-            "location": "forelegClawWingForelegRight"
+            "location": "forelegWingRight"
           },
           {
             "range": [2],
-            "location": "forelegClawWingForelegLeft"
+            "location": "forelegWingLeft"
           },
           {
             "range": [3],

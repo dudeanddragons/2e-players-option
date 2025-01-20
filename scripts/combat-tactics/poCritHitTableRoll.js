@@ -62,6 +62,30 @@ async function renderCritHitDialog(damageType, severity, targetName) {
         "poCritMinorHumanoidSlashing": "poCritHumanoidSlashingMinor.json",
         "poCritMortalHumanoidSlashing": "poCritHumanoidSlashingMortal.json",
         "poCritSevereHumanoidSlashing": "poCritHumanoidSlashingSevere.json",
+        "poCritMajorAnimalBludgeoning": "poCritAnimalBludgeoningMajor.json",
+        "poCritMinorAnimalBludgeoning": "poCritAnimalBludgeoningMinor.json",
+        "poCritMortalAnimalBludgeoning": "poCritAnimalBludgeoningMortal.json",
+        "poCritSevereAnimalBludgeoning": "poCritAnimalBludgeoningSevere.json",
+        "poCritMajorAnimalPiercing": "poCritAnimalPiercingMajor.json",
+        "poCritMortalAnimalPiercing": "poCritAnimalPiercingMortal.json",
+        "poCritSevereAnimalPiercing": "poCritAnimalPiercingSevere.json",
+        "poCritMinorAnimalPiercing": "poCritAnimalPiercingMinor.json",
+        "poCritMajorAnimalSlashing": "poCritAnimalSlashingMajor.json",
+        "poCritMinorAnimalSlashing": "poCritAnimalSlashingMinor.json",
+        "poCritMortalAnimalSlashing": "poCritAnimalSlashingMortal.json",
+        "poCritSevereAnimalSlashing": "poCritAnimalSlashingSevere.json",
+        "poCritMajorMonsterBludgeoning": "poCritMonsterBludgeoningMajor.json",
+        "poCritMinorMonsterBludgeoning": "poCritMonsterBludgeoningMinor.json",
+        "poCritMortalMonsterBludgeoning": "poCritMonsterBludgeoningMortal.json",
+        "poCritSevereMonsterBludgeoning": "poCritMonsterBludgeoningSevere.json",
+        "poCritMajorMonsterPiercing": "poCritMonsterPiercingMajor.json",
+        "poCritMinorMonsterPiercing": "poCritMonsterPiercingMinor.json",
+        "poCritMortalMonsterPiercing": "poCritMonsterPiercingMortal.json",
+        "poCritSevereMonsterPiercing": "poCritMonsterPiercingSevere.json",
+        "poCritMajorMonsterSlashing": "poCritMonsterSlashingMajor.json",
+        "poCritMinorMonsterSlashing": "poCritMonsterSlashingMinor.json",
+        "poCritMortalMonsterSlashing": "poCritMonsterSlashingMortal.json",
+        "poCritSevereMonsterSlashing": "poCritMonsterSlashingSevere.json"
     };
 
     async function fetchJSON(filePath) {
@@ -91,11 +115,20 @@ async function renderCritHitDialog(damageType, severity, targetName) {
             <form>
                 <div class="form-group">
                     <label for="damage-type">Damage Type:</label>
-                    <input type="text" id="damage-type" value="${capitalizeFirstLetter(damageType)}" disabled>
+                    <select id="damage-type">
+                        <option value="bludgeoning" ${damageType === "bludgeoning" ? "selected" : ""}>Bludgeoning</option>
+                        <option value="piercing" ${damageType === "piercing" ? "selected" : ""}>Piercing</option>
+                        <option value="slashing" ${damageType === "slashing" ? "selected" : ""}>Slashing</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="severity">Severity:</label>
-                    <input type="text" id="severity" value="${capitalizeFirstLetter(severity)}" disabled>
+                    <select id="severity">
+                        <option value="minor" ${severity === "minor" ? "selected" : ""}>Minor</option>
+                        <option value="major" ${severity === "major" ? "selected" : ""}>Major</option>
+                        <option value="severe" ${severity === "severe" ? "selected" : ""}>Severe</option>
+                        <option value="mortal" ${severity === "mortal" ? "selected" : ""}>Mortal</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="creature-type">Creature Type:</label>
@@ -103,7 +136,6 @@ async function renderCritHitDialog(damageType, severity, targetName) {
                         <option value="humanoid" selected>Humanoid</option>
                         <option value="animal">Animal</option>
                         <option value="monster">Monster</option>
-                        <option value="snakefish">SnakeFish</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -118,53 +150,56 @@ async function renderCritHitDialog(damageType, severity, targetName) {
             confirm: {
                 label: "Confirm",
                 callback: async (html) => {
+                    const selectedDamageType = html.find("#damage-type").val();
+                    const selectedSeverity = html.find("#severity").val();
                     const creatureType = html.find("#creature-type").val();
                     const location = html.find("#location").val();
-                    const constructedName = `poCrit${capitalizeFirstLetter(severity)}${capitalizeFirstLetter(creatureType)}${capitalizeFirstLetter(damageType)}`;
+    
+                    const constructedName = `poCrit${capitalizeFirstLetter(selectedSeverity)}${capitalizeFirstLetter(creatureType)}${capitalizeFirstLetter(selectedDamageType)}`;
                     const critTableFile = critTableFiles[constructedName];
                     const critTablePath = `modules/2e-players-option/scripts/combat-tactics/crit-tables/${critTableFile}`;
-
+    
                     if (!critTableFile) {
                         ui.notifications.error(`Critical hit table mapping not found for: ${constructedName}`);
                         return;
                     }
-
+    
                     const critTable = await fetchJSON(critTablePath);
-
+    
                     if (!critTable) {
                         ui.notifications.error(`Critical hit table not found at: ${critTablePath}`);
                         return;
                     }
-
+    
                     // Handle random location
                     let finalLocation = location;
                     if (location === "random") {
                         const locationTableName = `poTblCritLoc${capitalizeFirstLetter(creatureType)}`;
                         const locationTable = locationData.find(table => table.name === locationTableName);
-
+    
                         if (!locationTable) {
                             ui.notifications.error("Location table not found for random selection.");
                             return;
                         }
-
+    
                         finalLocation = await rollRandomLocation(locationTable.entries, locationTable.roll.dice);
                     }
-
+    
                     const critEntry = critTable.entries.find(entry => entry.location === finalLocation);
                     if (!critEntry) {
                         ui.notifications.error(`No entry found for location: ${finalLocation}`);
                         return;
                     }
-
+    
                     const effectsRoll = await new Roll("1d6").evaluate({ async: true });
                     const effect = critEntry.effects[effectsRoll.total - 1].effect;
-
+    
                     ChatMessage.create({
                         content: `
                             <h2>Critical Hit Results</h2>
                             <p><strong>Target:</strong> ${targetName}</p>
                             <p><strong>Creature Type:</strong> ${capitalizeFirstLetter(creatureType)}</p>
-                            <p><strong>Severity:</strong> ${capitalizeFirstLetter(severity)}</p>
+                            <p><strong>Severity:</strong> ${capitalizeFirstLetter(selectedSeverity)}</p>
                             <p><strong>Location:</strong> ${finalLocation}</p>
                             <p><strong>Effect:</strong> ${effect}</p>
                         `
@@ -176,23 +211,24 @@ async function renderCritHitDialog(damageType, severity, targetName) {
         render: (html) => {
             const creatureTypeField = html.find("#creature-type");
             const locationField = html.find("#location");
-
+    
             const updateLocationDropdown = () => {
                 const creatureType = creatureTypeField.val();
                 const locationTableName = `poTblCritLoc${capitalizeFirstLetter(creatureType)}`;
                 const locationTable = locationData.find(table => table.name === locationTableName);
-
+    
                 if (locationTable) {
                     locationField.html(generateLocationOptions(locationTable.entries));
                 } else {
                     locationField.html('<option value="">No Locations Found</option>');
                 }
             };
-
+    
             updateLocationDropdown();
             creatureTypeField.on("change", updateLocationDropdown);
         },
     }).render(true);
+    
 }
 
 async function rollRandomLocation(entries, diceExpression) {
