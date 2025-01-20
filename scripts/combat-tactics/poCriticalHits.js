@@ -32,9 +32,11 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     const atkWeapon = atkWeaponUuid ? await fromUuid(atkWeaponUuid) : null;
     const atkWeaponName = atkWeapon?.name || "Unknown Weapon";
 
-// Fetch THAC0 from the actor's attributes
-const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
+    // Fetch THAC0 from the actor's attributes
+    const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
 
+    // Fetch weapon size, default to actor size if missing
+    const atkWeaponSize = atkWeapon?.system?.attributes?.size || atkActor?.system?.attributes?.size || "medium";
 
     // Fetch weapon damage type
     const atkDamageType = atkWeapon?.system?.damage?.type || "Unknown";
@@ -79,6 +81,20 @@ const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
     };
     const atkKnockdownRollTarget = knockdownRollTable[atkTargetSize.toLowerCase()] || "Unknown";
 
+    // Determine critical severity based on weapon size vs. target size
+    const sizeHierarchy = ["tiny", "small", "medium", "large", "huge", "gargantuan"];
+    const atkWeaponSizeIndex = sizeHierarchy.indexOf(atkWeaponSize.toLowerCase());
+    const atkTargetSizeIndex = sizeHierarchy.indexOf(atkTargetSize.toLowerCase());
+
+    let atkCriticalSeverity = "Unknown";
+    if (atkWeaponSizeIndex >= 0 && atkTargetSizeIndex >= 0) {
+        const sizeDifference = atkWeaponSizeIndex - atkTargetSizeIndex;
+        if (sizeDifference < 0) atkCriticalSeverity = "Minor";
+        else if (sizeDifference === 0) atkCriticalSeverity = "Major";
+        else if (sizeDifference === 1) atkCriticalSeverity = "Severe";
+        else if (sizeDifference >= 2) atkCriticalSeverity = "Mortal";
+    }
+
     // Extract target AC if available
     const strippedContent = chatMessage.content.replace(/<\/?[^>]+(>|$)/g, ""); // Remove HTML tags
     const atkTargetAcMatch = strippedContent.match(/Target\s+AC\s+(-?\d+)/i);
@@ -102,6 +118,7 @@ const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
 
     // Fetch attacker size for knockdown logic
     const atkActorSize = atkActor?.system?.attributes?.size || "medium";
+    
 
     // Knockdown size adjustment logic
     const sizeAdjustmentTable = {
@@ -134,17 +151,17 @@ const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
         console.log("Performing secondary roll to confirm critical hit...");
         atkCriticalHit = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkThac0, "critical");
     }
-    
+
     if (atkFumbleThreat && criticalMissOption === "natural1Reroll") {
         console.log("Performing secondary roll to confirm fumble...");
         atkFumble = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkThac0, "fumble");
     }
-    
 
     // Log the results
     console.log(`Attack Metadata:
         Actor: ${atkActorName} (UUID: ${atkActorUuid}),
         Weapon: ${atkWeaponName} (UUID: ${atkWeaponUuid}),
+        Weapon Size: ${atkWeaponSize},
         Weapon Damage Type: ${atkDamageType},
         Critical Properties: ${atkCriticalProperties || "None"},
         Natural Roll: ${atkNaturalRoll},
@@ -152,10 +169,12 @@ const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
         Roll Formula: ${atkRollFormula},
         Target: ${atkTargetName} (UUID: ${atkTargetTokenUuid}),
         Target Size: ${atkTargetSize},
+        Critical Severity: ${atkCriticalSeverity},
         Target AC: ${atkTargetAc ?? "Unknown"},
         Hit AC: ${atkHitAc ?? "Unknown"},
         Hit By: ${atkHitBy},
         Attack Hit: ${atkAttackHit},
+        Actor Size: ${atkActorSize},
         Actor THAC0: ${atkThac0},
         Critical Range: ${atkCriticalRange},
         Critical Threat: ${atkCriticalThreat},
@@ -169,6 +188,7 @@ const atkThac0 = atkActor?.system?.attributes?.thaco?.value;
 
     console.log("Critical hit, fumble, and knockdown processing complete.");
 });
+
 
 
 /**
