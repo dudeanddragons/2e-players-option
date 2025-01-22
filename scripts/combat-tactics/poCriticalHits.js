@@ -178,7 +178,6 @@ Hooks.on("createChatMessage", async (chatMessage) => {
 
 
 
-
 /**
  * Perform a secondary roll to confirm critical or fumble.
  * Uses AD&D 2E logic: THAC0 - Total Roll = Hit AC.
