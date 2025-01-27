@@ -31,7 +31,6 @@
     "scripts/poSettings.js",
     "scripts/combat-tactics/poInitiativePhase.js",
     "scripts/combat-tactics/poCriticalHits.js",
-    "scripts/combat-tactics/poCritHitTableRoll.js",
     "scripts/combat-tactics/poCharacterSheetGeneral.js",
     "scripts/combat-tactics/poWeaponAttributes.js",
     "scripts/combat-tactics/poCombatRounds.js",

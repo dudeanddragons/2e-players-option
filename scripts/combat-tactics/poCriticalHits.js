@@ -87,7 +87,7 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     const atkWeaponSizeIndex = sizeHierarchy.indexOf(atkWeaponSize.toLowerCase());
     const atkTargetSizeIndex = sizeHierarchy.indexOf(atkTargetSize.toLowerCase());
 
-    let atkCriticalSeverity = "Unknown";
+    let atkCriticalSeverity = "unknown"; // Default to unknown
     if (atkWeaponSizeIndex >= 0 && atkTargetSizeIndex >= 0) {
         const sizeDifference = atkWeaponSizeIndex - atkTargetSizeIndex;
         if (sizeDifference < 0) atkCriticalSeverity = "Minor";
@@ -95,6 +95,7 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         else if (sizeDifference === 1) atkCriticalSeverity = "Severe";
         else if (sizeDifference >= 2) atkCriticalSeverity = "Mortal";
     }
+    
 
     // Extract target AC if available
     const strippedContent = chatMessage.content.replace(/<\/?[^>]+(>|$)/g, ""); // Remove HTML tags
@@ -171,8 +172,7 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         weapon: { name: atkWeaponName, uuid: atkWeaponUuid, size: atkWeaponSize, damageType: atkDamageType },
         target: { name: atkTargetName, uuid: atkTargetActorUuid, size: atkTargetSize, ac: atkTargetAc, hitAc: atkHitAc, hitBy: atkHitBy, attackHit: atkAttackHit },
         roll: { natural: atkNaturalRoll, total: atkTotalRoll, formula: atkRollFormula },
-        severity: atkCriticalSeverity,
-        critical: { threat: atkCriticalThreat, confirmed: atkCriticalHit },
+        critical: { threat: atkCriticalThreat, confirmed: atkCriticalHit, severity: atkCriticalSeverity },
         fumble: { threat: atkFumbleThreat, confirmed: atkFumble },
         knockdown: { dice: atkKnockdownDice, adjustment: atkKnockdownAdj, targetRoll: atkKnockdownRollTarget },
     };
@@ -180,8 +180,10 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     console.log("Attack Metadata:", attackMetadata);
 
     if (atkCriticalHit) {
+        console.log(`Confirmed Critical Hit for ${atkActorName}. Calling processCriticalHit hook.`);
         Hooks.call("processCriticalHit", attackMetadata);
     }
+    
 
     if (atkFumble) {
         console.log(`Confirmed Fumble for ${atkActorName} (UUID: ${atkActorUuid}). Processing fumble table result...`);
@@ -189,6 +191,20 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     }
 });
 
+Hooks.on("processCriticalHit", (attackMetadata) => {
+    if (!game.user.isGM) {
+        console.log(`Critical hit dialog restricted to GMs.`);
+        return;
+    }
+
+    const { weapon, target, critical, } = attackMetadata;
+    const damageType = weapon?.damageType || "unknown";
+    const severity = critical?.severity || "unknown";
+    const targetName = target?.name || "Unknown Target";
+
+    console.log(`Rendering critical hit dialog for target: ${targetName}, damage type: ${damageType}, severity: ${severity}.`);
+    renderCritHitDialog(damageType, severity, targetName);
+});
 
 
 /**
@@ -264,16 +280,204 @@ async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollTy
     }
 }
 
+/**
+ * Renders the critical hit dialog.
+ */
+async function renderCritHitDialog(damageType, severity, targetName) {
+    const locationTablePath = "modules/2e-players-option/scripts/combat-tactics/crit-tables/poTableCritLocations.json";
 
+    const critTableFiles = {
+        "poCritMajorHumanoidBludgeoning": "poCritHumanoidBludgeoningMajor.json",
+        "poCritMinorHumanoidBludgeoning": "poCritHumanoidBludgeoningMinor.json",
+        "poCritMortalHumanoidBludgeoning": "poCritHumanoidBludgeoningMortal.json",
+        "poCritSevereHumanoidBludgeoning": "poCritHumanoidBludgeoningSevere.json",
+        "poCritMajorHumanoidPiercing": "poCritHumanoidPiercingMajor.json",
+        "poCritMinorHumanoidPiercing": "poCritHumanoidPiercingMinor.json",
+        "poCritMortalHumanoidPiercing": "poCritHumanoidPiercingMortal.json",
+        "poCritSevereHumanoidPiercing": "poCritHumanoidPiercingSevere.json",
+        "poCritMajorHumanoidSlashing": "poCritHumanoidSlashingMajor.json",
+        "poCritMinorHumanoidSlashing": "poCritHumanoidSlashingMinor.json",
+        "poCritMortalHumanoidSlashing": "poCritHumanoidSlashingMortal.json",
+        "poCritSevereHumanoidSlashing": "poCritHumanoidSlashingSevere.json",
+        "poCritMajorAnimalBludgeoning": "poCritAnimalBludgeoningMajor.json",
+        "poCritMinorAnimalBludgeoning": "poCritAnimalBludgeoningMinor.json",
+        "poCritMortalAnimalBludgeoning": "poCritAnimalBludgeoningMortal.json",
+        "poCritSevereAnimalBludgeoning": "poCritAnimalBludgeoningSevere.json",
+        "poCritMajorAnimalPiercing": "poCritAnimalPiercingMajor.json",
+        "poCritMortalAnimalPiercing": "poCritAnimalPiercingMortal.json",
+        "poCritSevereAnimalPiercing": "poCritAnimalPiercingSevere.json",
+        "poCritMinorAnimalPiercing": "poCritAnimalPiercingMinor.json",
+        "poCritMajorAnimalSlashing": "poCritAnimalSlashingMajor.json",
+        "poCritMinorAnimalSlashing": "poCritAnimalSlashingMinor.json",
+        "poCritMortalAnimalSlashing": "poCritAnimalSlashingMortal.json",
+        "poCritSevereAnimalSlashing": "poCritAnimalSlashingSevere.json",
+        "poCritMajorMonsterBludgeoning": "poCritMonsterBludgeoningMajor.json",
+        "poCritMinorMonsterBludgeoning": "poCritMonsterBludgeoningMinor.json",
+        "poCritMortalMonsterBludgeoning": "poCritMonsterBludgeoningMortal.json",
+        "poCritSevereMonsterBludgeoning": "poCritMonsterBludgeoningSevere.json",
+        "poCritMajorMonsterPiercing": "poCritMonsterPiercingMajor.json",
+        "poCritMinorMonsterPiercing": "poCritMonsterPiercingMinor.json",
+        "poCritMortalMonsterPiercing": "poCritMonsterPiercingMortal.json",
+        "poCritSevereMonsterPiercing": "poCritMonsterPiercingSevere.json",
+        "poCritMajorMonsterSlashing": "poCritMonsterSlashingMajor.json",
+        "poCritMinorMonsterSlashing": "poCritMonsterSlashingMinor.json",
+        "poCritMortalMonsterSlashing": "poCritMonsterSlashingMortal.json",
+        "poCritSevereMonsterSlashing": "poCritMonsterSlashingSevere.json"
+    };
 
+    async function fetchJSON(filePath) {
+        try {
+            console.log(`Fetching JSON from: ${filePath}`);
+            const response = await fetch(filePath);
+            if (!response.ok) throw new Error(`Failed to fetch JSON: ${response.statusText}`);
+            return await response.json();
+        } catch (err) {
+            console.error(`Error fetching JSON from ${filePath}:`, err);
+            ui.notifications.error(`Error loading JSON: ${err.message}`);
+        }
+    }
 
+    const locationData = await fetchJSON(locationTablePath);
+    if (!locationData) return;
 
+    function generateLocationOptions(entries) {
+        const options = entries.map(entry => `<option value="${entry.location}">${entry.location}</option>`);
+        options.unshift('<option value="random">Random</option>');
+        return options.join("");
+    }
 
+    new Dialog({
+        title: "Critical Hit Details",
+        content: `
+            <form>
+                <div class="form-group">
+                    <label for="damage-type">Damage Type:</label>
+                    <select id="damage-type">
+                        <option value="bludgeoning" ${damageType === "bludgeoning" ? "selected" : ""}>Bludgeoning</option>
+                        <option value="piercing" ${damageType === "piercing" ? "selected" : ""}>Piercing</option>
+                        <option value="slashing" ${damageType === "slashing" ? "selected" : ""}>Slashing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="severity">Severity:</label>
+                    <select id="severity">
+                        <option value="minor" ${severity.toLowerCase() === "minor" ? "selected" : ""}>Minor</option>
+                        <option value="major" ${severity.toLowerCase() === "major" ? "selected" : ""}>Major</option>
+                        <option value="severe" ${severity.toLowerCase() === "severe" ? "selected" : ""}>Severe</option>
+                        <option value="mortal" ${severity.toLowerCase() === "mortal" ? "selected" : ""}>Mortal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="creature-type">Creature Type:</label>
+                    <select id="creature-type">
+                        <option value="humanoid" selected>Humanoid</option>
+                        <option value="animal">Animal</option>
+                        <option value="monster">Monster</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <select id="location">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+            </form>
+        `,
+        buttons: {
+            confirm: {
+                label: "Confirm",
+                callback: async (html) => {
+                    const selectedDamageType = html.find("#damage-type").val();
+                    const selectedSeverity = html.find("#severity").val();
+                    const creatureType = html.find("#creature-type").val();
+                    const location = html.find("#location").val();
+    
+                    const constructedName = `poCrit${capitalizeFirstLetter(selectedSeverity)}${capitalizeFirstLetter(creatureType)}${capitalizeFirstLetter(selectedDamageType)}`;
+                    const critTableFile = critTableFiles[constructedName];
+                    const critTablePath = `modules/2e-players-option/scripts/combat-tactics/crit-tables/${critTableFile}`;
+    
+                    if (!critTableFile) {
+                        ui.notifications.error(`Critical hit table mapping not found for: ${constructedName}`);
+                        return;
+                    }
+    
+                    const critTable = await fetchJSON(critTablePath);
+    
+                    if (!critTable) {
+                        ui.notifications.error(`Critical hit table not found at: ${critTablePath}`);
+                        return;
+                    }
+    
+                    // Handle random location
+                    let finalLocation = location;
+                    if (location === "random") {
+                        const locationTableName = `poTblCritLoc${capitalizeFirstLetter(creatureType)}`;
+                        const locationTable = locationData.find(table => table.name === locationTableName);
+    
+                        if (!locationTable) {
+                            ui.notifications.error("Location table not found for random selection.");
+                            return;
+                        }
+    
+                        finalLocation = await rollRandomLocation(locationTable.entries, locationTable.roll.dice);
+                    }
+    
+                    const critEntry = critTable.entries.find(entry => entry.location === finalLocation);
+                    if (!critEntry) {
+                        ui.notifications.error(`No entry found for location: ${finalLocation}`);
+                        return;
+                    }
+    
+                    const effectsRoll = await new Roll("1d6").evaluate({ async: true });
+                    const effect = critEntry.effects[effectsRoll.total - 1].effect;
+    
+                    ChatMessage.create({
+                        content: `
+                            <h2>Critical Hit Results</h2>
+                            <p><strong>Target:</strong> ${targetName}</p>
+                            <p><strong>Creature Type:</strong> ${capitalizeFirstLetter(creatureType)}</p>
+                            <p><strong>Severity:</strong> ${capitalizeFirstLetter(selectedSeverity)}</p>
+                            <p><strong>Location:</strong> ${finalLocation}</p>
+                            <p><strong>Effect:</strong> ${effect}</p>
+                        `
+                    });
+                },
+            },
+            cancel: { label: "Cancel" },
+        },
+        render: (html) => {
+            const creatureTypeField = html.find("#creature-type");
+            const locationField = html.find("#location");
+    
+            const updateLocationDropdown = () => {
+                const creatureType = creatureTypeField.val();
+                const locationTableName = `poTblCritLoc${capitalizeFirstLetter(creatureType)}`;
+                const locationTable = locationData.find(table => table.name === locationTableName);
+    
+                if (locationTable) {
+                    locationField.html(generateLocationOptions(locationTable.entries));
+                } else {
+                    locationField.html('<option value="">No Locations Found</option>');
+                }
+            };
+    
+            updateLocationDropdown();
+            creatureTypeField.on("change", updateLocationDropdown);
+        },
+    }).render(true);
+    
+}
 
+async function rollRandomLocation(entries, diceExpression) {
+    const roll = await new Roll(diceExpression).evaluate({ async: true });
+    const rolledValue = roll.total;
+    const entry = entries.find(e => e.range.some(r => r === rolledValue));
+    return entry ? entry.location : "Unknown";
+}
 
-
-
-
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
 
 /**
  * Process the fumble table result.
@@ -366,9 +570,6 @@ async function processFumbleResult(actorUuid, actorName) {
     await actor.unsetFlag("world", "fumbleProcessed");
 }
 
-
-
-
 /**
  * Roll on the Armor Trouble subtable.
  */
@@ -395,8 +596,6 @@ async function rollArmorTrouble(actorUuid, actorName) {
     console.log(`Armor Trouble Roll for ${actorName} (UUID: ${actorUuid}): ${roll.total} - ${result}`);
     return `Armor Trouble: ${result}`;
 }
-
-
 
 /**
  * Roll on the Mount Trouble subtable.
@@ -425,8 +624,6 @@ async function rollMountTrouble(actorUuid, actorName) {
     return `Mount Trouble: ${result}`;
 }
 
-
-
 /**
  * Roll on the Weapon Trouble subtable.
  */
@@ -453,13 +650,3 @@ async function rollWeaponTrouble(actorUuid, actorName) {
     console.log(`Weapon Trouble Roll for ${actorName} (UUID: ${actorUuid}): ${roll.total} - ${result}`);
     return `Weapon Trouble: ${result}`;
 }
-
-
-
-
-
-
-
-
-
-
