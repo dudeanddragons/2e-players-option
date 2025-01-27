@@ -160,12 +160,6 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         atkFumble = true;
     }
     
-    if (atkFumble) {
-        console.log(`Processing fumble table for ${atkActorName}...`);
-        await processFumbleResult(atkActorUuid, atkActorName);
-    }
-    
-    
     
     
     
@@ -238,14 +232,14 @@ async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollTy
         // Determine if the roll confirms a critical or fumble
         let confirmed = false;
         if (rollType === "critical" && secondaryHitAC <= targetAC) {
-            console.log("Secondary roll confirmed the critical hit!");
+            console.log("Critical Threat!");
             ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor: actor }),
                 content: `<strong>Confirmed Critical Hit!</strong>`,
             });
             confirmed = true;
         } else if (rollType === "fumble" && secondaryHitAC > targetAC) {
-            console.log("Secondary roll confirmed the fumble!");
+            console.log("Fumble Threat!");
             ChatMessage.create({
                 speaker: ChatMessage.getSpeaker({ actor: actor }),
                 content: `<strong>Confirmed Fumble!</strong>`,
@@ -288,17 +282,32 @@ async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollTy
  * @param {string} actorName - The display name of the actor.
  */
 async function processFumbleResult(actorUuid, actorName) {
+    const actor = await fromUuid(actorUuid);
+
+    // Check if the fumble table has already been processed for this actor
+    if (await actor.getFlag("world", "fumbleProcessed")) {
+        console.log(`Fumble already processed for ${actorName}. Skipping.`);
+        return; // Prevent duplicate processing
+    }
+
+    // Set the flag to indicate fumble processing is underway
+    await actor.setFlag("world", "fumbleProcessed", true);
+
+    // Roll on the main fumble table
     const fumbleRoll = new Roll("1d20");
     await fumbleRoll.evaluate({ async: true });
     const fumbleResult = fumbleRoll.total;
 
     console.log(`Fumble Table Roll for ${actorName} (UUID: ${actorUuid}): ${fumbleResult}`);
 
-    // Determine the result from the fumble table
+    // Define the fumble message
     let fumbleMessage = "";
+    let secondaryResultMessage = null;
+
+    // Switch logic for fumble results
     switch (true) {
         case fumbleResult <= 2:
-            fumbleMessage = await rollArmorTrouble(actorUuid, actorName); // Armor Trouble Subtable
+            secondaryResultMessage = await rollArmorTrouble(actorUuid, actorName); // Armor Trouble Subtable
             break;
         case fumbleResult <= 4:
             fumbleMessage = "Battlefield Damaged: Something nearby is broken (e.g., furniture, equipment).";
@@ -325,7 +334,7 @@ async function processFumbleResult(actorUuid, actorName) {
             fumbleMessage = "Lucky Opening: The target gains +4 to their next attack roll.";
             break;
         case fumbleResult <= 15:
-            fumbleMessage = await rollMountTrouble(actorUuid, actorName); // Mount Trouble Subtable
+            secondaryResultMessage = await rollMountTrouble(actorUuid, actorName); // Mount Trouble Subtable
             break;
         case fumbleResult === 16:
             fumbleMessage = "Reinforcements: Allies of the DM's choice arrive.";
@@ -337,18 +346,26 @@ async function processFumbleResult(actorUuid, actorName) {
             fumbleMessage = `Slip: ${actorName} falls and spends the round on their back.`;
             break;
         case fumbleResult >= 19:
-            fumbleMessage = await rollWeaponTrouble(actorUuid, actorName); // Weapon Trouble Subtable
+            secondaryResultMessage = await rollWeaponTrouble(actorUuid, actorName); // Weapon Trouble Subtable
             break;
     }
 
-    console.log(`Fumble Result for ${actorName}: ${fumbleMessage}`);
+    // Combine the main and secondary results
+    const finalMessage = [fumbleMessage, secondaryResultMessage].filter(Boolean).join("<br>");
 
-    // Output the fumble result to chat
-    ChatMessage.create({
-        speaker: { alias: actorName },
-        content: `<strong>Fumble Result:</strong> ${fumbleMessage}`,
-    });
+    // Send a single chat message
+    if (finalMessage) {
+        ChatMessage.create({
+            speaker: { alias: actorName },
+            content: `<strong>Fumble Result:</strong> ${finalMessage}`,
+        });
+    }
+
+    // Clear the flag after processing
+    console.log(`Clearing fumbleProcessed flag for ${actorName}.`);
+    await actor.unsetFlag("world", "fumbleProcessed");
 }
+
 
 
 

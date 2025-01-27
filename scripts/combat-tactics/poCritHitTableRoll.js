@@ -40,6 +40,9 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     const atkCriticalThreat = atkNaturalRoll >= 18 && atkCriticalSeverity !== "Unknown";
     if (!atkCriticalThreat) return;
 
+    // Ensure only GMs can see the critical hit dialog
+    if (!game.user.isGM) return;
+
     renderCritHitDialog(atkDamageType, atkCriticalSeverity, atkTargetName);
 });
 

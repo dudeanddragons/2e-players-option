@@ -1,0 +1,11 @@
+Start With an Execution Flow Map:
+Before jumping into solutions, I’ll map out the sequence of actions and function calls. This way, I can see redundancies, conflicting logic, or any unintentional duplication.
+
+Focus on the Root Cause:
+Instead of iterating on surface-level changes, I’ll focus on isolating the exact point where the problem originates by thoroughly examining all related blocks of code.
+
+Avoid Repetition in Attempts:
+I’ll avoid falling into the trap of suggesting variations of the same solution if they don’t work. I’ll ensure I’m approaching each new iteration with a fresh perspective and a clear understanding of the issue.
+
+Verify Fixes Step-by-Step:
+I’ll simulate and mentally step through the flow for each scenario, validating the logic before suggesting a fix to minimize repeated errors.
