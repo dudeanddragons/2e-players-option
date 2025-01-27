@@ -120,26 +120,103 @@ Hooks.on("createChatMessage", async (chatMessage) => {
 
     // Fetch attacker size for knockdown logic
     const atkActorSize = atkActor?.system?.attributes?.size || "medium";
+    
+// Knockdown size adjustment logic
+const sizeAdjustmentTable = {
+    tiny: -2,
+    small: -1,
+    medium: 0,
+    large: 1,
+    huge: 2,
+    gargantuan: 3,
+};
+const defaultKnockdownDiceTable = ["1d4", "1d6", "1d8", "1d10", "1d12"];
 
-    // Knockdown size adjustment logic
-    const sizeAdjustmentTable = {
-        tiny: -2,
-        small: -1,
-        medium: 0,
-        large: 1,
-        huge: 2,
-        gargantuan: 3,
-    };
+// Fetch knockdown dice from weapon flags
+let atkKnockdownDice = "1d4"; // Default to 1d4
+if (atkWeapon) {
+    const weaponKnockdownFlag = atkWeapon.getFlag("core", "knockdown");
+    if (weaponKnockdownFlag) {
+        atkKnockdownDice = weaponKnockdownFlag;
+    } else {
+        console.log(`Knockdown flag not set on weapon "${atkWeapon.name}". Using default value: ${atkKnockdownDice}`);
+    }
+}
 
-    // Determine default knockdown dice based on attacker size
-    const defaultKnockdownDiceTable = ["1d4", "1d6", "1d8", "1d10", "1d12"];
-    const atkKnockdownDice = "1d8"; // Default dice
+// Adjust knockdown dice based on attacker size
+const sizeAdjustment = sizeAdjustmentTable[atkActorSize.toLowerCase()] || 0;
+const baseDiceIndex = defaultKnockdownDiceTable.indexOf(atkKnockdownDice);
+const adjustedDiceIndex = Math.max(0, Math.min(defaultKnockdownDiceTable.length - 1, baseDiceIndex + sizeAdjustment));
+const atkKnockdownAdj = defaultKnockdownDiceTable[adjustedDiceIndex];
 
-    // Calculate knockdown adjustment
-    const sizeAdjustment = sizeAdjustmentTable[atkActorSize.toLowerCase()] || 0;
-    const baseDiceIndex = defaultKnockdownDiceTable.indexOf(atkKnockdownDice);
-    const adjustedDiceIndex = Math.max(0, Math.min(defaultKnockdownDiceTable.length - 1, baseDiceIndex + sizeAdjustment));
-    const atkKnockdownAdj = defaultKnockdownDiceTable[adjustedDiceIndex];
+if (atkAttackHit) {
+    console.log(`Processing knockdown for target: ${atkTargetName} (UUID: ${atkTargetActorUuid}).`);
+
+    // Ensure only the GM processes knockdown rolls
+    if (!game.user.isGM) {
+        console.log(`Skipping knockdown logic. Only the GM may process this.`);
+        return;
+    }
+
+    // Roll the knockdown dice
+    const knockdownRoll = new Roll(atkKnockdownAdj);
+    await knockdownRoll.evaluate({ async: true });
+    const knockdownRollResult = knockdownRoll.total;
+
+    // Determine success or failure
+    const knockdownSuccess = knockdownRollResult >= atkKnockdownRollTarget;
+    const knockdownOutcome = knockdownSuccess ? "Success" : "Failure";
+
+    console.log(`Knockdown roll result: ${knockdownRollResult} vs. target roll: ${atkKnockdownRollTarget} (${knockdownOutcome})`);
+
+// Determine the header and save message
+const knockdownHeader = knockdownSuccess 
+    ? `<div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 5px; text-align: center; font-weight: bold; color: #155724;">
+        ${atkTargetName} Knocked Down!
+      </div>` 
+    : `<div style="background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 5px; text-align: center; font-weight: bold; color: #721c24;">
+        No Knockdown
+      </div>`;
+
+const saveMessage = knockdownSuccess 
+    ? `<div style="text-align: center; font-style: italic; color: #856404; margin-top: 5px;">
+        ${atkTargetName} must save vs. paralyzation or be knocked prone!
+      </div>` 
+    : "";
+
+// Collapsible details styled to match
+const detailedResults = `
+    <details style="margin-top: 10px; padding: 5px; background-color: #fdfd96; border: 1px solid #f0e68c; border-radius: 4px;">
+        <summary style="cursor: pointer; color: #856404; font-weight: bold;">Expand Details:</summary>
+        <div style="margin-top: 5px; font-size: 0.9em; color: #444;">
+            <p><strong>Attacker:</strong> ${atkActorName}</p>
+            <p><strong>Target:</strong> ${atkTargetName}</p>
+            <p><strong>Base Dice:</strong> ${atkKnockdownDice}</p>
+            <p><strong>Adjusted Dice:</strong> ${atkKnockdownAdj}</p>
+            <p><strong>Roll Result:</strong> ${knockdownRollResult}</p>
+            <p><strong>Target Threshold:</strong> ${atkKnockdownRollTarget}</p>
+        </div>
+    </details>
+`;
+
+// Combine everything
+const knockdownMessage = `
+    <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f8f9fa;">
+        ${knockdownHeader}
+        ${saveMessage}
+        ${detailedResults}
+    </div>
+`;
+
+// Post the chat message (as GM)
+ChatMessage.create({
+    speaker: { alias: atkActorName },
+    content: knockdownMessage,
+});
+
+
+
+    }
 
     // Initialize critical hit and fumble flags
     let atkCriticalThreat = atkNaturalRoll >= atkCriticalRange && atkAttackHit;
@@ -147,7 +224,7 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     let atkFumbleThreat = atkNaturalRoll === 1;
     let atkFumble = false;
 
-    // === Critical Hit Logic ===
+    // === Critical Event Attempt ===
     if (atkCriticalThreat && (criticalHitOption === "natural20Reroll" || criticalHitOption === "natural18Reroll")) {
         console.log("Performing secondary roll to confirm critical hit...");
         atkCriticalHit = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkThac0, "critical");
@@ -161,11 +238,6 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         atkFumble = true;
     }
     
-    
-    
-    
-    
-
     // Log the results
     const attackMetadata = {
         actor: { name: atkActorName, uuid: atkActorUuid, size: atkActorSize, thac0: atkThac0 },
@@ -189,6 +261,13 @@ Hooks.on("createChatMessage", async (chatMessage) => {
         console.log(`Confirmed Fumble for ${atkActorName} (UUID: ${atkActorUuid}). Processing fumble table result...`);
         await processFumbleResult(atkActorUuid, atkActorName);
     }
+    
+    
+    
+    
+
+
+    
 });
 
 Hooks.on("processCriticalHit", (attackMetadata) => {

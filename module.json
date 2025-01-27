@@ -30,7 +30,7 @@
   "scripts": [
     "scripts/poSettings.js",
     "scripts/combat-tactics/poInitiativePhase.js",
-    "scripts/combat-tactics/poCriticalHits.js",
+    "scripts/combat-tactics/poAttack.js",
     "scripts/combat-tactics/poCharacterSheetGeneral.js",
     "scripts/combat-tactics/poWeaponAttributes.js",
     "scripts/combat-tactics/poCombatRounds.js",
@@ -42,6 +42,5 @@
     "templates/poCombatTacticsConfig.hbs"
 ],
   "manifest": "https://raw.githubusercontent.com/dudeanddragons/2e-players-option/refs/heads/master/module.json",
-  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.01.21.01.zip",
-  "website": "https://github.com/dudeanddragons/2e-players-option"
+  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.01.21.01.zip"
 }
