@@ -153,9 +153,23 @@ Hooks.on("createChatMessage", async (chatMessage) => {
     }
 
     if (atkFumbleThreat && criticalMissOption === "natural1Reroll") {
-        console.log("Performing secondary roll to confirm fumble...");
+        console.log(`Performing secondary roll to confirm fumble for ${atkActorName}...`);
         atkFumble = await performSecondaryAttack(atkActor, atkRollFormula, atkTargetAc, atkThac0, "fumble");
+    } else if (atkFumbleThreat) {
+        console.log(`Fumble confirmed without secondary roll for ${atkActorName}.`);
+        atkFumble = true;
     }
+    
+    if (atkFumble) {
+        console.log(`Processing fumble table for ${atkActorName}...`);
+        await processFumbleResult(atkActorUuid, atkActorName);
+    }
+    
+    
+    
+    
+    
+    
 
     // Log the results
     const attackMetadata = {
@@ -173,6 +187,11 @@ Hooks.on("createChatMessage", async (chatMessage) => {
 
     if (atkCriticalHit) {
         Hooks.call("processCriticalHit", attackMetadata);
+    }
+
+    if (atkFumble) {
+        console.log(`Confirmed Fumble for ${atkActorName} (UUID: ${atkActorUuid}). Processing fumble table result...`);
+        await processFumbleResult(atkActorUuid, atkActorName);
     }
 });
 
@@ -233,6 +252,173 @@ async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollTy
         return false;
     }
 }
+
+
+
+
+
+
+
+
+
+/**
+ * Process the fumble table result.
+ * Rolls on the main fumble table and handles any required subtables.
+ * @param {string} actorUuid - The UUID of the actor tied to the fumble.
+ * @param {string} actorName - The display name of the actor.
+ */
+async function processFumbleResult(actorUuid, actorName) {
+    const fumbleRoll = new Roll("1d20");
+    await fumbleRoll.evaluate({ async: true });
+    const fumbleResult = fumbleRoll.total;
+
+    console.log(`Fumble Table Roll for ${actorName} (UUID: ${actorUuid}): ${fumbleResult}`);
+
+    // Determine the result from the fumble table
+    let fumbleMessage = "";
+    switch (true) {
+        case fumbleResult <= 2:
+            fumbleMessage = await rollArmorTrouble(actorUuid, actorName); // Armor Trouble Subtable
+            break;
+        case fumbleResult <= 4:
+            fumbleMessage = "Battlefield Damaged: Something nearby is broken (e.g., furniture, equipment).";
+            break;
+        case fumbleResult === 5:
+            fumbleMessage = "Battlefield Shifts: Combatants are moved 1d6 squares randomly without provoking attacks of opportunity.";
+            break;
+        case fumbleResult === 6:
+            fumbleMessage = "Close Quarters: Combatants Grappled!";
+            break;
+        case fumbleResult === 7:
+            fumbleMessage = "Item Damaged: A random item is damaged. Roll a saving throw to see if it breaks.";
+            break;
+        case fumbleResult === 8:
+            fumbleMessage = "Item Dropped: An item is dropped, spilled, or cut free.";
+            break;
+        case fumbleResult <= 11:
+            fumbleMessage = `Knock Down: ${actorName} is knocked to the ground. Save vs. paralyzation or fall.`;
+            break;
+        case fumbleResult === 12:
+            fumbleMessage = "Lucky Break: The target gains +4 AC and saving throws for one round.";
+            break;
+        case fumbleResult === 13:
+            fumbleMessage = "Lucky Opening: The target gains +4 to their next attack roll.";
+            break;
+        case fumbleResult <= 15:
+            fumbleMessage = await rollMountTrouble(actorUuid, actorName); // Mount Trouble Subtable
+            break;
+        case fumbleResult === 16:
+            fumbleMessage = "Reinforcements: Allies of the DM's choice arrive.";
+            break;
+        case fumbleResult === 17:
+            fumbleMessage = `Retreat: ${actorName} is driven back.`;
+            break;
+        case fumbleResult === 18:
+            fumbleMessage = `Slip: ${actorName} falls and spends the round on their back.`;
+            break;
+        case fumbleResult >= 19:
+            fumbleMessage = await rollWeaponTrouble(actorUuid, actorName); // Weapon Trouble Subtable
+            break;
+    }
+
+    console.log(`Fumble Result for ${actorName}: ${fumbleMessage}`);
+
+    // Output the fumble result to chat
+    ChatMessage.create({
+        speaker: { alias: actorName },
+        content: `<strong>Fumble Result:</strong> ${fumbleMessage}`,
+    });
+}
+
+
+
+/**
+ * Roll on the Armor Trouble subtable.
+ */
+async function rollArmorTrouble(actorUuid, actorName) {
+    const roll = new Roll("1d6");
+    await roll.evaluate({ async: true });
+
+    let result = "";
+    switch (roll.total) {
+        case 1:
+        case 2:
+            result = "Helm lost: The victim's head is exposed.";
+            break;
+        case 3:
+        case 4:
+        case 5:
+            result = "Shield lost.";
+            break;
+        case 6:
+            result = "Plate/Padding lost: +2 to AC (plate armor only).";
+            break;
+    }
+
+    console.log(`Armor Trouble Roll for ${actorName} (UUID: ${actorUuid}): ${roll.total} - ${result}`);
+    return `Armor Trouble: ${result}`;
+}
+
+
+
+/**
+ * Roll on the Mount Trouble subtable.
+ */
+async function rollMountTrouble(actorUuid, actorName) {
+    const roll = new Roll("1d6");
+    await roll.evaluate({ async: true });
+
+    let result = "";
+    switch (roll.total) {
+        case 1:
+        case 2:
+        case 3:
+            result = "Mount bolts: It sprints for 1d10 rounds in a random direction, or until the rider rolls a successful riding proficiency check.";
+            break;
+        case 4:
+        case 5:
+            result = "Mount rears: The rider must roll a successful riding proficiency check or fall off the mount.";
+            break;
+        case 6:
+            result = "Mount falls: The thrown rider must roll a successful saving throw vs. paralyzation or be stunned for 1d6 rounds.";
+            break;
+    }
+
+    console.log(`Mount Trouble Roll for ${actorName} (UUID: ${actorUuid}): ${roll.total} - ${result}`);
+    return `Mount Trouble: ${result}`;
+}
+
+
+
+/**
+ * Roll on the Weapon Trouble subtable.
+ */
+async function rollWeaponTrouble(actorUuid, actorName) {
+    const roll = new Roll("1d6");
+    await roll.evaluate({ async: true });
+
+    let result = "";
+    switch (roll.total) {
+        case 1:
+        case 2:
+            result = `Disarmed: ${actorName} drops their weapon unless they succeed on a saving throw vs. paralyzation.`;
+            break;
+        case 3:
+        case 4:
+        case 5:
+            result = "Hard parry: The weapon may break unless it passes a successful item saving throw vs. crushing blow.";
+            break;
+        case 6:
+            result = `Weapon stuck: If ${actorName} killed an opponent last round, the weapon is stuck in the foe's body. {actorName} must take one round to pull it free.`;
+            break;
+    }
+
+    console.log(`Weapon Trouble Roll for ${actorName} (UUID: ${actorUuid}): ${roll.total} - ${result}`);
+    return `Weapon Trouble: ${result}`;
+}
+
+
+
 
 
 
