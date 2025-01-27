@@ -204,54 +204,74 @@ Hooks.on("createChatMessage", async (chatMessage) => {
 async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollType) {
     if (!game.user.isGM) return false; // Ensure only the GM can execute this
 
-    // Roll for the secondary attack
-    const secondaryRoll = new Roll(formula);
-    await secondaryRoll.evaluate({ async: true }); // Evaluate the roll asynchronously
-
-    // Send the roll to chat for transparency
-    await secondaryRoll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
-        flavor: rollType === "critical" ? "Critical Threat Roll" : "Fumble Confirmation Roll",
-    });
-
-    const secondaryRollResult = secondaryRoll.total; // The result of the secondary roll
-
-    // Calculate the AC hit by the secondary roll
-    const secondaryHitAC = atkThac0 - secondaryRollResult;
-
-    // Logging the secondary roll details
-    console.log(`Secondary Attack Roll Details:
-        Roll Type: ${rollType},
-        Target AC: ${targetAC},
-        Secondary Roll Result: ${secondaryRollResult},
-        Actor THAC0: ${atkThac0}, // Correctly using the actor's THAC0 from metadata
-        Hit AC (Secondary Roll): ${secondaryHitAC}
-    `);
-
-    // Determine if the roll confirms a critical or fumble
-    if (rollType === "critical" && secondaryHitAC <= targetAC) {
-        console.log("Secondary roll confirmed the critical hit!");
-        ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
-            content: `<strong>Confirmed Critical Hit!</strong>`,
-        });
-        return true;
-    } else if (rollType === "fumble" && secondaryHitAC > targetAC) {
-        console.log("Secondary roll confirmed the fumble!");
-        ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
-            content: `<strong>Confirmed Fumble!</strong>`,
-        });
-        return true;
-    } else {
-        console.log(`Secondary roll did not confirm the ${rollType}.`);
-        ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
-            content: `<strong>${rollType === "critical" ? "Critical Hit Not Confirmed" : "Fumble Not Confirmed"}</strong>`,
-        });
+    // Check if a secondary roll has already been performed for this attack
+    if (actor[`${rollType}SecondaryRollPerformed`]) {
+        console.log(`${rollType.charAt(0).toUpperCase() + rollType.slice(1)} secondary roll already performed for ${actor.name}. Skipping.`);
         return false;
     }
+
+    try {
+        // Mark the roll as performed
+        actor[`${rollType}SecondaryRollPerformed`] = true;
+
+        // Perform the roll
+        const secondaryRoll = new Roll(formula);
+        await secondaryRoll.evaluate({ async: true });
+
+        // Send the roll to chat for transparency
+        await secondaryRoll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            flavor: rollType === "critical" ? "Critical Threat Roll" : "Fumble Confirmation Roll",
+        });
+
+        const secondaryRollResult = secondaryRoll.total; // The result of the secondary roll
+        const secondaryHitAC = atkThac0 - secondaryRollResult; // Calculate hit AC
+
+        console.log(`Secondary Attack Roll Details:
+            Roll Type: ${rollType},
+            Target AC: ${targetAC},
+            Secondary Roll Result: ${secondaryRollResult},
+            Actor THAC0: ${atkThac0},
+            Hit AC (Secondary Roll): ${secondaryHitAC}
+        `);
+
+        // Determine if the roll confirms a critical or fumble
+        let confirmed = false;
+        if (rollType === "critical" && secondaryHitAC <= targetAC) {
+            console.log("Secondary roll confirmed the critical hit!");
+            ChatMessage.create({
+                speaker: ChatMessage.getSpeaker({ actor: actor }),
+                content: `<strong>Confirmed Critical Hit!</strong>`,
+            });
+            confirmed = true;
+        } else if (rollType === "fumble" && secondaryHitAC > targetAC) {
+            console.log("Secondary roll confirmed the fumble!");
+            ChatMessage.create({
+                speaker: ChatMessage.getSpeaker({ actor: actor }),
+                content: `<strong>Confirmed Fumble!</strong>`,
+            });
+            confirmed = true;
+        } else {
+            console.log(`Secondary roll did not confirm the ${rollType}.`);
+            ChatMessage.create({
+                speaker: ChatMessage.getSpeaker({ actor: actor }),
+                content: `<strong>${rollType === "critical" ? "Critical Hit Not Confirmed" : "Fumble Not Confirmed"}</strong>`,
+            });
+        }
+
+        return confirmed;
+    } catch (error) {
+        console.error("Error during secondary roll:", error);
+        return false;
+    } finally {
+        // Clear the flag after the roll logic completes
+        console.log(`Clearing ${rollType}SecondaryRollPerformed flag for ${actor.name}.`);
+        actor[`${rollType}SecondaryRollPerformed`] = false;
+    }
 }
+
+
+
 
 
 
