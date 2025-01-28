@@ -568,14 +568,24 @@ async function renderCritHitDialog(damageType, severity, targetName) {
     
                     ChatMessage.create({
                         content: `
-                            <h2>Critical Hit Results</h2>
-                            <p><strong>Target:</strong> ${targetName}</p>
-                            <p><strong>Creature Type:</strong> ${capitalizeFirstLetter(creatureType)}</p>
-                            <p><strong>Severity:</strong> ${capitalizeFirstLetter(selectedSeverity)}</p>
-                            <p><strong>Location:</strong> ${finalLocation}</p>
-                            <p><strong>Effect:</strong> ${effect}</p>
+                            <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f8f9fa;">
+                                <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 5px; text-align: center; font-weight: bold; font-size: 1.2em; color: #155724;">
+                                    ${capitalizeFirstLetter(selectedSeverity)} Critical Hit - ${capitalizeFirstLetter(finalLocation)}
+                                </div>
+                                <div style="text-align: center; margin-top: 5px; font-size: 1.1em; color: #333;">
+                                    ${effect}
+                                </div>
+                                <details style="margin-top: 10px; padding: 5px; background-color: #fdfd96; border: 1px solid #f0e68c; border-radius: 4px;">
+                                    <summary style="cursor: pointer; color: #856404; font-weight: bold;">Expand Details:</summary>
+                                    <div style="margin-top: 5px; font-size: 0.9em; color: #444;">
+                                        <p><strong>Creature Type:</strong> ${capitalizeFirstLetter(creatureType)}</p>
+                                        <p><strong>Weapon Type:</strong> ${capitalizeFirstLetter(selectedDamageType)}</p>
+                                    </div>
+                                </details>
+                            </div>
                         `
                     });
+                    
                 },
             },
             cancel: { label: "Cancel" },
