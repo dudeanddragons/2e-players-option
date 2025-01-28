@@ -39,6 +39,18 @@ class CombatHUDActions {
             },
         ];
 
+        // Add GM-only "Reset Fatigue" button
+        if (game.user.isGM) {
+            buttons.push({
+                class: "reset-fatigue",
+                title: "Reset Fatigue",
+                icon: "fas fa-undo",
+                onClick: async (actor) => {
+                    await CombatHUDActions.resetFatigue(actor);
+                },
+            });
+        }
+
         buttons.forEach((button) => {
             if (actionsGroup.find(`.${button.class}`).length) return;
             const buttonHTML = `
@@ -138,47 +150,51 @@ class CombatHUDActions {
                 ],
             },
         ];
-    
+
         const currentFA = actor.getFlag("core", "currentFA") || 0;
         const maxFA = actor.getFlag("core", "maxFA") || 1;
-    
-        // Determine the highest applicable tier
+
         const targetTier = encumbranceTiers.reduce((result, tier, index) => {
             const threshold = maxFA * (index + 1);
             return currentFA >= threshold ? tier : result;
         }, null);
-    
-        if (!targetTier) return; // No encumbrance tier applicable
-    
-        // Find any existing encumbrance effect
+
+        if (!targetTier) return;
+
         const currentEffect = actor.effects.find((effect) =>
             encumbranceTiers.some((tier) => effect.statuses?.has(tier.id))
         );
-    
+
         if (currentEffect) {
             const currentTierId = Array.from(currentEffect.statuses || [])[0];
-    
-            // If the current effect matches the target tier, do nothing
             if (currentTierId === targetTier.id) return;
-    
-            // Remove the current effect
+
             await currentEffect.delete();
         }
-    
-        // Apply the new encumbrance effect
+
         const effectData = {
             name: targetTier.name,
             icon: targetTier.icon,
             origin: "macro.manageEncumbrance",
-            duration: { seconds: 600 }, // Temporary effect for 10 minutes
+            duration: { seconds: 600 },
             changes: targetTier.changes,
-            statuses: [targetTier.id], // Correctly using the statuses array
+            statuses: [targetTier.id],
         };
-    
+
         await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
     }
-    
-    
+
+    static async resetFatigue(actor) {
+        const encumbranceTiers = ["encumbrance-light", "encumbrance-moderate", "encumbrance-heavy", "encumbrance-severe"];
+        const encumbranceEffects = actor.effects.filter((effect) =>
+            effect.statuses?.some((status) => encumbranceTiers.includes(status))
+        );
+        for (const effect of encumbranceEffects) {
+            await effect.delete();
+        }
+
+        await actor.setFlag("core", "currentFA", 0);
+    }
 }
 
 // Hook into ARS Combat HUD rendering
