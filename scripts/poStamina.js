@@ -150,13 +150,13 @@ class CombatHUDActions {
     
         if (!targetTier) return; // No encumbrance tier applicable
     
-        // Find the current encumbrance effect
+        // Find any existing encumbrance effect
         const currentEffect = actor.effects.find((effect) =>
-            encumbranceTiers.some((tier) => effect.getFlag("core", "statusId") === tier.id)
+            encumbranceTiers.some((tier) => effect.statuses?.has(tier.id))
         );
     
         if (currentEffect) {
-            const currentTierId = currentEffect.getFlag("core", "statusId");
+            const currentTierId = Array.from(currentEffect.statuses || [])[0];
     
             // If the current effect matches the target tier, do nothing
             if (currentTierId === targetTier.id) return;
@@ -172,15 +172,12 @@ class CombatHUDActions {
             origin: "macro.manageEncumbrance",
             duration: { seconds: 600 }, // Temporary effect for 10 minutes
             changes: targetTier.changes,
-            flags: {
-                core: {
-                    statusId: targetTier.id,
-                },
-            },
+            statuses: [targetTier.id], // Correctly using the statuses array
         };
     
         await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
     }
+    
     
 }
 
