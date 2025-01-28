@@ -1,82 +1,30 @@
 class CombatHUDActions {
     static addButtonsToHUD(app, html, data) {
-        // Ensure the HUD is for a valid actor
         if (!app.actor) return;
 
-        // Locate the `.mini-actions-buttons` section containing controls
         const actionsGroup = html.find(".mini-actions-buttons");
         if (!actionsGroup.length) {
             console.warn("Actions group not found in ARS HUD.");
             return;
         }
 
-        // Define button configurations
         const buttons = [
             {
                 class: "half-move-action",
                 title: "Half-Move Action",
                 icon: "fas fa-shoe-prints",
-                effect: {
-                    name: "Moved",
-                    duration: 12, // Duration in seconds
-                    icon: "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
-                    statusId: "moved",
-                },
                 onClick: async (actor) => {
-                    // Apply the Moved effect
-                    const effectData = {
-                        name: "Moved",
-                        duration: {
-                            seconds: 12,
-                        },
-                        icon: "icons/skills/movement/feet-winged-boots-glowing-yellow.webp",
-                        origin: actor.uuid,
-                        changes: [],
-                        flags: {
-                            core: {
-                                statusId: "moved",
-                            },
-                        },
-                    };
-                    await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-
-                    // Delay the turn
+                    await CombatHUDActions.addEffect(actor, "Moved", "icons/skills/movement/feet-winged-boots-glowing-yellow.webp");
                     await CombatHUDActions.delayTurnForActor(actor);
                 },
             },
             {
                 class: "attack-action",
                 title: "Attack Action",
-                icon: "fas fa-swords", // Crossed swords icon
-                effect: {
-                    name: "Attacked",
-                    duration: 12, // Duration in seconds
-                    icon: "icons/skills/melee/weapons-crossed-swords-yellow.webp",
-                    statusId: "attacked",
-                },
+                icon: "fas fa-swords",
                 onClick: async (actor) => {
-                    // Apply the Attacked effect
-                    const effectData = {
-                        name: "Attacked",
-                        duration: {
-                            seconds: 12,
-                        },
-                        icon: "icons/skills/melee/weapons-crossed-swords-yellow.webp",
-                        origin: actor.uuid,
-                        changes: [],
-                        flags: {
-                            core: {
-                                statusId: "attacked",
-                            },
-                        },
-                    };
-                    await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-
-                    // Increment Fatigue (currentFA)
-                    const currentFA = actor.getFlag("core", "currentFA") || 0; // Default to 0 if undefined
-                    await actor.setFlag("core", "currentFA", currentFA + 1); // Add 1 to currentFA
-
-                    // Delay the turn
+                    await CombatHUDActions.addEffect(actor, "Attacked", "icons/skills/melee/weapons-crossed-swords-yellow.webp");
+                    await CombatHUDActions.incrementFatigue(actor);
                     await CombatHUDActions.delayTurnForActor(actor);
                 },
             },
@@ -85,22 +33,14 @@ class CombatHUDActions {
                 title: "Full Attack",
                 icon: "fas fa-crosshairs",
                 onClick: async (actor) => {
-                    // Increment Fatigue (currentFA)
-                    const currentFA = actor.getFlag("core", "currentFA") || 0; // Default to 0 if undefined
-                    await actor.setFlag("core", "currentFA", currentFA + 1); // Add 1 to currentFA
-
-                    // End the actor's turn
+                    await CombatHUDActions.incrementFatigue(actor);
                     await CombatHUDActions.endTurnForActor(actor);
                 },
             },
         ];
 
-        // Add buttons to the beginning of the HUD
         buttons.forEach((button) => {
-            // Check if the button already exists to prevent duplicates
             if (actionsGroup.find(`.${button.class}`).length) return;
-
-            // Insert the button
             const buttonHTML = `
                 <li class="mini-action flexrow ${button.class}" title="${button.title}">
                     <div class="mini-action-button action-name rollable mini-action-init" data-type="action-name">
@@ -109,59 +49,139 @@ class CombatHUDActions {
                     </div>
                 </li>
             `;
-            actionsGroup.prepend(buttonHTML); // Add to the beginning of the actions group
-
-            // Add click event listener to the button
+            actionsGroup.prepend(buttonHTML);
             actionsGroup.find(`.${button.class}`).on("click", async () => {
-                await button.onClick(app.actor); // Invoke the button's specific action
+                await button.onClick(app.actor);
             });
         });
     }
 
+    static async addEffect(actor, effectName, effectIcon) {
+        const effectData = {
+            name: effectName,
+            icon: effectIcon,
+            origin: actor.uuid,
+            changes: [],
+            duration: { seconds: 600 }, // Temporary effect
+        };
+        await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+    }
+
     static async delayTurnForActor(actor) {
         const combat = game.combat;
-        if (!combat) {
-            console.warn("No active combat found.");
-            return;
-        }
+        if (!combat) return;
 
         const combatant = combat.combatants.find((c) => c.actorId === actor.id);
-        if (!combatant) {
-            console.warn("The actor is not part of the combat.");
-            return;
-        }
+        if (!combatant) return;
 
-        // Calculate the new initiative
         const lastInit = combat._getLastInInitiative();
-        console.log("Delaying turn for combatant:", combatant, "New initiative:", lastInit + 1);
-
-        // Check if it's the combatant's turn and advance it
         if (combatant.id === combat.combatant?.id) {
             await combat.nextTurn(combatant);
         }
-
-        // Update the combatant's initiative
         await combatant.update({ initiative: lastInit + 1 });
     }
 
     static async endTurnForActor(actor) {
         const combat = game.combat;
-        if (!combat) {
-            console.warn("No active combat found.");
-            return;
-        }
+        if (!combat) return;
 
         const combatant = combat.combatants.find((c) => c.actorId === actor.id);
-        if (!combatant) {
-            console.warn("The actor is not part of the combat.");
-            return;
-        }
+        if (!combatant) return;
 
-        // End the actor's turn by advancing to the next turn
         if (combatant.id === combat.combatant?.id) {
             await combat.nextTurn();
         }
     }
+
+    static async incrementFatigue(actor) {
+        const currentFA = actor.getFlag("core", "currentFA") || 0;
+        const maxFA = actor.getFlag("core", "maxFA") || 0;
+
+        const newFA = currentFA + 1;
+        await actor.setFlag("core", "currentFA", newFA);
+
+        CombatHUDActions.updateEncumbrance(actor);
+    }
+
+    static async updateEncumbrance(actor) {
+        const encumbranceTiers = [
+            {
+                id: "encumbrance-light",
+                name: "Light Encumbrance",
+                icon: "systems/ars/icons/general/encumbrance-light.png",
+                changes: [],
+            },
+            {
+                id: "encumbrance-moderate",
+                name: "Moderate Encumbrance",
+                icon: "systems/ars/icons/general/encumbrance-moderate.png",
+                changes: [
+                    { key: "system.mods.attack.value", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-1" },
+                ],
+            },
+            {
+                id: "encumbrance-heavy",
+                name: "Heavy Encumbrance",
+                icon: "systems/ars/icons/general/encumbrance-heavy.png",
+                changes: [
+                    { key: "system.mods.attack.value", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2" },
+                    { key: "system.mods.ac.value", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-1" },
+                ],
+            },
+            {
+                id: "encumbrance-severe",
+                name: "Severe Encumbrance",
+                icon: "systems/ars/icons/general/encumbrance-severe.png",
+                changes: [
+                    { key: "system.mods.attack.value", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-4" },
+                    { key: "system.mods.ac.value", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-3" },
+                ],
+            },
+        ];
+    
+        const currentFA = actor.getFlag("core", "currentFA") || 0;
+        const maxFA = actor.getFlag("core", "maxFA") || 1;
+    
+        // Determine the highest applicable tier
+        const targetTier = encumbranceTiers.reduce((result, tier, index) => {
+            const threshold = maxFA * (index + 1);
+            return currentFA >= threshold ? tier : result;
+        }, null);
+    
+        if (!targetTier) return; // No encumbrance tier applicable
+    
+        // Find the current encumbrance effect
+        const currentEffect = actor.effects.find((effect) =>
+            encumbranceTiers.some((tier) => effect.getFlag("core", "statusId") === tier.id)
+        );
+    
+        if (currentEffect) {
+            const currentTierId = currentEffect.getFlag("core", "statusId");
+    
+            // If the current effect matches the target tier, do nothing
+            if (currentTierId === targetTier.id) return;
+    
+            // Remove the current effect
+            await currentEffect.delete();
+        }
+    
+        // Apply the new encumbrance effect
+        const effectData = {
+            name: targetTier.name,
+            icon: targetTier.icon,
+            origin: "macro.manageEncumbrance",
+            duration: { seconds: 600 }, // Temporary effect for 10 minutes
+            changes: targetTier.changes,
+            flags: {
+                core: {
+                    statusId: targetTier.id,
+                },
+            },
+        };
+    
+        await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+    }
+    
 }
 
 // Hook into ARS Combat HUD rendering
