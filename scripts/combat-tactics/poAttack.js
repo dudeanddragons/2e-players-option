@@ -307,46 +307,100 @@ async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollTy
         const secondaryRoll = new Roll(formula);
         await secondaryRoll.evaluate({ async: true });
 
-        // Send the roll to chat for transparency
-        await secondaryRoll.toMessage({
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
-            flavor: rollType === "critical" ? "Critical Threat Roll" : "Fumble Confirmation Roll",
-        });
-
-        const secondaryRollResult = secondaryRoll.total; // The result of the secondary roll
+        const secondaryRollResult = secondaryRoll.total; // Total result of the roll
         const secondaryHitAC = atkThac0 - secondaryRollResult; // Calculate hit AC
+        const naturalRoll = secondaryRoll.terms[0].results[0].result; // Extract the natural roll
+
+        // Set the color of the natural roll based on its value
+        const rollColor = naturalRoll === 1 ? "red" : naturalRoll === 20 ? "green" : "black";
+
+        // Build the breakdown for bonuses only (excluding the initial dice roll)
+        const bonuses = secondaryRoll.terms.slice(1) // Ignore the first term (1d20)
+            .filter(term => typeof term.total === "number") // Include only numeric terms
+            .map(term => `${term.operator || "+"} ${term.total}`) // Include the operator and value
+            .join(" "); // Join them with spaces
 
         console.log(`Secondary Attack Roll Details:
             Roll Type: ${rollType},
             Target AC: ${targetAC},
             Secondary Roll Result: ${secondaryRollResult},
+            Natural Roll: ${naturalRoll},
             Actor THAC0: ${atkThac0},
             Hit AC (Secondary Roll): ${secondaryHitAC}
         `);
 
-        // Determine if the roll confirms a critical or fumble
+        // Determine confirmation status using natural roll logic
         let confirmed = false;
-        if (rollType === "critical" && secondaryHitAC <= targetAC) {
-            console.log("Critical Threat!");
-            ChatMessage.create({
-                speaker: ChatMessage.getSpeaker({ actor: actor }),
-                content: `<strong>Confirmed Critical Hit!</strong>`,
-            });
-            confirmed = true;
-        } else if (rollType === "fumble" && secondaryHitAC > targetAC) {
-            console.log("Fumble Threat!");
-            ChatMessage.create({
-                speaker: ChatMessage.getSpeaker({ actor: actor }),
-                content: `<strong>Confirmed Fumble!</strong>`,
-            });
-            confirmed = true;
+
+        if (naturalRoll === 1) {
+            // Natural 1 always fails to confirm a critical or always confirms a fumble
+            confirmed = rollType === "fumble";
+        } else if (naturalRoll === 20) {
+            // Natural 20 always confirms a critical or always fails to confirm a fumble
+            confirmed = rollType === "critical";
         } else {
-            console.log(`Secondary roll did not confirm the ${rollType}.`);
-            ChatMessage.create({
-                speaker: ChatMessage.getSpeaker({ actor: actor }),
-                content: `<strong>${rollType === "critical" ? "Critical Hit Not Confirmed" : "Fumble Not Confirmed"}</strong>`,
-            });
+            // Otherwise, use standard logic based on the calculated hit AC
+            if (rollType === "critical" && secondaryHitAC <= targetAC) {
+                confirmed = true;
+            } else if (rollType === "fumble" && secondaryHitAC > targetAC) {
+                confirmed = true;
+            }
         }
+
+        // Styling for confirmed or not confirmed
+        const headerColor = confirmed ? "#d4edda" : "#f8d7da";
+        const borderColor = confirmed ? "#c3e6cb" : "#f5c6cb";
+        const textColor = confirmed ? "#155724" : "#721c24";
+
+        // Generate result message
+        const resultMessage = confirmed
+            ? `<strong style="color: green;">${rollType === "critical" ? "Critical Confirmed!" : "Fumble Confirmed!"}</strong>`
+            : `<strong style="color: red;">${rollType === "critical" ? "Critical Not Confirmed" : "Fumble Not Confirmed"}</strong>`;
+
+        // Roll breakdown string with the dice icon behind the natural roll
+        const rollBreakdown = `
+            <span style="position: relative; display: inline-block; width: 30px; height: 30px; line-height: 30px; text-align: center; font-weight: bold; font-size: 1.2em; color: ${rollColor}; background: url('icons/svg/d20-grey.svg') no-repeat center; background-size: contain;">
+                ${naturalRoll}
+            </span> 
+            ${bonuses ? bonuses : ""} = <strong>${secondaryRollResult}</strong>
+        `;
+
+        // Collapsible details
+        const detailedResults = `
+            <details style="margin-top: 10px; padding: 5px; background-color: #fdfd96; border: 1px solid #f0e68c; border-radius: 4px;">
+                <summary style="cursor: pointer; color: #856404; font-weight: bold;">Expand Details:</summary>
+                <div style="margin-top: 5px; font-size: 0.9em; color: #444;">
+                    <p><strong>Roll Type:</strong> ${rollType}</p>
+                    <p><strong>Roll Result:</strong> ${secondaryRollResult}</p>
+                    <p><strong>Natural Roll:</strong> ${naturalRoll}</p>
+                    <p><strong>Actor THAC0:</strong> ${atkThac0}</p>
+                    <p><strong>Target AC:</strong> ${targetAC}</p>
+                    <p><strong>Hit AC (Secondary Roll):</strong> ${secondaryHitAC}</p>
+                </div>
+            </details>
+        `;
+
+        // Combine everything into a styled message
+        const secondaryRollMessage = `
+            <div style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; background-color: #f8f9fa;">
+                <div style="background-color: ${headerColor}; border: 1px solid ${borderColor}; padding: 5px; text-align: center; font-weight: bold; color: ${textColor};">
+                    ${rollType === "critical" ? "Critical Threat" : "Fumble Threat"}
+                </div>
+                <div style="text-align: center; margin-top: 5px; font-size: 1.1em; color: #333;">
+                    ${rollBreakdown}
+                </div>
+                <div style="text-align: center; font-style: italic; color: #856404; margin-top: 5px;">
+                    ${resultMessage}
+                </div>
+                ${detailedResults}
+            </div>
+        `;
+
+        // Post the styled chat message
+        ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor }),
+            content: secondaryRollMessage,
+        });
 
         return confirmed;
     } catch (error) {
@@ -358,6 +412,8 @@ async function performSecondaryAttack(actor, formula, targetAC, atkThac0, rollTy
         actor[`${rollType}SecondaryRollPerformed`] = false;
     }
 }
+
+
 
 /**
  * Renders the critical hit dialog.
