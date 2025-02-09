@@ -1,7 +1,7 @@
 {
   "id": "2e-players-option",
   "title": "2e Players Option",
-  "version": "12.25.01.28.01",
+  "version": "12.25.02.09.01",
   "compatibility": {
     "minimum": "12",
     "verified": "12",
@@ -43,5 +43,5 @@
     "templates/poCombatTacticsConfig.hbs"
 ],
   "manifest": "https://raw.githubusercontent.com/dudeanddragons/2e-players-option/refs/heads/master/module.json",
-  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.01.28.01.zip"
+  "download": "https://github.com/dudeanddragons/2e-players-option/archive/refs/tags/12.25.02.09.01.zip"
 }
