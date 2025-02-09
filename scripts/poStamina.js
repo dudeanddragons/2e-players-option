@@ -14,7 +14,7 @@ class CombatHUDActions {
                 title: "Half-Move Action",
                 icon: "fas fa-shoe-prints",
                 onClick: async (actor) => {
-                    await CombatHUDActions.addEffect(actor, "Moved", "icons/skills/movement/feet-winged-boots-glowing-yellow.webp");
+                    await CombatHUDActions.addEffect(actor, "Moved", "icons/skills/movement/feet-winged-boots-glowing-yellow.webp", 12);
                     await CombatHUDActions.delayTurnForActor(actor);
                 },
             },
@@ -23,7 +23,7 @@ class CombatHUDActions {
                 title: "Attack Action",
                 icon: "fas fa-swords",
                 onClick: async (actor) => {
-                    await CombatHUDActions.addEffect(actor, "Attacked", "icons/skills/melee/weapons-crossed-swords-yellow.webp");
+                    await CombatHUDActions.addEffect(actor, "Attacked", "icons/skills/melee/weapons-crossed-swords-yellow.webp", 12);
                     await CombatHUDActions.incrementFatigue(actor);
                     await CombatHUDActions.delayTurnForActor(actor);
                 },
@@ -68,13 +68,20 @@ class CombatHUDActions {
         });
     }
 
-    static async addEffect(actor, effectName, effectIcon) {
+    /**
+     * Add an effect to an actor.
+     * @param {Actor} actor - The target actor.
+     * @param {string} effectName - Name of the effect.
+     * @param {string} effectIcon - Icon URL for the effect.
+     * @param {number} duration - Duration in seconds (default: 600s for fatigue, 12s for others).
+     */
+    static async addEffect(actor, effectName, effectIcon, duration = 600) {
         const effectData = {
             name: effectName,
             icon: effectIcon,
             origin: actor.uuid,
             changes: [],
-            duration: { seconds: 600 }, // Temporary effect
+            duration: { seconds: duration },
         };
         await actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
     }
